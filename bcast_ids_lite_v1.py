@@ -436,24 +436,6 @@ def take(n, iterable):
     return dict(islice(iterable, n))
 
 
-"""Contabiliza los paquetes ARP de la captura"""
-def count_arp():
-
-    ARPrq_Total = 0 # Posicion 4 de la lista
-    ARPpb_Total = 0 # Posicion 5 de la lista
-    ARPan_Total = 0 # Posicion 6 de la lista
-    ARPgr_Total = 0 # Posicion 7 de la lista
-
-    for key, value in mac_line.items():
-        ARPrq_Total += value[4]
-        ARPpb_Total += value[5]
-        ARPan_Total += value[6]
-        ARPgr_Total += value[7]
-
-    values = [ARPrq_Total, ARPpb_Total, ARPan_Total, ARPgr_Total]
-    return(values)
-
-
 """ Almacena el valor maximo de los ficheros ./tm y ipf en un fichero de salida ./max_macs.txt y max_ipf.txt"""
 def max_value(param, fich_salida):
     # Numero de MACs vistas en las ultimas 4 horas
