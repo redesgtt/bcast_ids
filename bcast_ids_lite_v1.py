@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-##############################################################
-#                      BCAST_IDS
-#                    LITE VERSION
+#########################################################################
+#                               BCAST_IDS
+#                             LITE VERSION
 #
-#                    Dpto de Redes
-#           Gestion Tributaria Territorial
-#                        2020
-##############################################################
+#                             Dpto de Redes
+#                    Gestion Tributaria Territorial
+#                                 2020
+#########################################################################
 
 import binascii
 import dpkt
@@ -387,16 +387,16 @@ def mac_lines(pcap):
             ip_src_ipf = line_ipf.split("_")[0]
             ip_dst_ipf = line_ipf.split("_")[1]
             for mac_s, ip_s in ipm_subred.items():
-                uniq_ipf_dst = set()
+                #uniq_ipf_dst = set()
                 if ip_src_ipf == ip_s:
                     #print(mac_s, ip_dst_ipf)
                     if mac_s in mac_line:
                         #print(mac_s, ip_dst_ipf)
-                        if mac_s not in mac_ipf:
-                            uniq_ipf_dst.add(ip_dst_ipf)
-                            mac_ipf[mac_s]=uniq_ipf_dst
-                        else:
-                            mac_ipf[mac_s].add(ip_dst_ipf)
+                        #if mac_s not in mac_ipf:
+                        #    uniq_ipf_dst.add(ip_dst_ipf)
+                        #    mac_ipf[mac_s]=uniq_ipf_dst
+                        #else:
+                        #    mac_ipf[mac_s].add(ip_dst_ipf)
                         l = mac_line[mac_s]
                         l[8] += 1
 
@@ -434,27 +434,6 @@ def check_macs():
 """Para obtener las primeras n MACs de mas actividad de la captura"""
 def take(n, iterable):
     return dict(islice(iterable, n))
-
-
-""" Almacena el valor maximo de los ficheros ./tm y ipf en un fichero de salida ./max_macs.txt y max_ipf.txt"""
-def max_value(param, fich_salida):
-    # Numero de MACs vistas en las ultimas 4 horas
-    MACs = len(load_json(param))
-
-    if os.path.isfile(fich_salida):
-        a = read_txt(fich_salida)
-        if a:
-            if int(a) < MACs:
-                #print("Actualizamos")
-                save_txt(fich_salida, str(MACs))
-        else:
-            #print("Actualizamos. No se ha detectado numero en el fichero")
-            save_txt(fich_salida, str(MACs))
-    else:
-        #print("No existe el fichero, se crea uno nuevo")
-        save_txt(fich_salida, str(MACs))
-
-    return(int(read_txt(fich_salida)))
 
 
 """Guarda la captura en el directorio forensic"""
