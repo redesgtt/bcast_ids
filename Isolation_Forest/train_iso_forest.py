@@ -24,7 +24,8 @@ def train_if(dataset, c, filename='model_iso_forest.bin'):
         y = dataFrame['SALIDA']
         X = dataFrame[dataFrame.columns[1:17]]
         #X = dataFrame.drop(['MAC','UCAST','SALIDA','BCAST','ARPpb','ARPgr','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO'], axis=1)
-        X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2)
+        #X = dataFrame.drop(['NUM_MAC','MAC','SALIDA'], axis=1)
+        X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2, random_state=42)
         print (" Training data set : ",X_train.shape)
         print (" Test data set : ",X_test.shape)
         print (" Number of Anomaly cases in training set : ",len(y_train[y_train==1]))

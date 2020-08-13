@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 import argparse
 import sys
 import os
@@ -61,6 +61,7 @@ def predict_dataset_if(dataset, filename):
             to_model_columns=dataFrame.columns[1:18]
             dataFrame[to_model_columns] = dataFrame[to_model_columns].astype(int)
             dataFrame_noSALIDA = dataFrame[dataFrame.columns[1:17]]
+            #dataFrame_noSALIDA = dataFrame.drop(['NUM_MAC','MAC','SALIDA'], axis=1)
             #dataFrame_noSALIDA = dataFrame.drop(['IP_TCP','ARPpb','ARPan','MAC','SALIDA','IP_UDP','IP6','UCAST','MCAST'], axis=1)
             #dataFrame_noSALIDA = dataFrame.drop(['MAC','NUM_MAC','SALIDA','IP_UDP','IP6','MCAST', 'ARPpb', 'ARPan','UCAST','MCAST'], axis=1)
             prediction = loaded_model.predict(dataFrame_noSALIDA)
@@ -88,8 +89,8 @@ def predict_dataset_if(dataset, filename):
 
 if __name__ == '__main__':
     text_help= "Script para realizar la prediccion del modelo Isolation Forest entrenado."
-    text_help += "\n\t./predict_iso_forest.py -s \"000ffec58a53;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\""
-    text_help += "\n\t./predict_iso_forest.py -s \"000ffec58a53;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\" -m modelo.bin"
+    text_help += "\n\t./predict_iso_forest.py -s \"000fxxxxxxxx;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\""
+    text_help += "\n\t./predict_iso_forest.py -s \"000fxxxxxxxx;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\" -m modelo.bin"
     text_help += "\n\t./predict_iso_forest.py -d dataset30.csv"
     text_help += "\n\t./predict_iso_forest.py -d dataset30.csv -m modelo.bin"
     text_help += "\nSALIDA"
