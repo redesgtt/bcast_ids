@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 ####################################################################################
 #
@@ -47,7 +47,7 @@ def ActMaxMacs(dataFrame, verbose=False):
     if not dataFrame.empty:
         for mac in uniq_macs:
             dfMaxMac = dataFrame.loc[dataFrame['MAC'] == mac]
-            dfMaxMac = dfMaxMac.drop(['MAC','SALIDA'], axis=1)
+            dfMaxMac = dfMaxMac.drop(['MAC'], axis=1)
             dfMaxMac = dfMaxMac.max(axis=0)
             mac_maxAct[mac] = list(dfMaxMac)
 
@@ -97,8 +97,7 @@ def imprimeActMacs(param):
 if __name__ == '__main__':
     text_help= "Genera outliers de una mac en un dataset determinado."
     text_help += "\n\t./tunea_entradas.py -d dataset.csv -> Visualiza el valor maximo de cada feature del dataset de las MACs"
-    #text_help += "\n\t./tunea_entradas.py -d dataset.csv -m 000ffec58a53 -> Incrementa el valor de los campos en un 20% (por defecto) de la MAC 000ffec58a53"
-    text_help += "\n\t./tunea_entradas.py -d dataset.csv -m 000ffec58a53 -t 0.4 -> Incrementa el valor de los campos en un 40% de la MAC 000ffec58a53"
+    text_help += "\n\t./tunea_entradas.py -d dataset.csv -m 000fXXXXXXXX -t 0.4 -> Incrementa el valor de los campos en un 40% de la MAC 000fXXXXXXXX"
     text_help += "\n\t./tunea_entradas.py -d dataset.csv -t 0.4 -> Incrementa el valor de los campos de todas las MACs en un 40%"
     ap = argparse.ArgumentParser(text_help)
     ap.add_argument("-m", "--MAC", required=False, help="Direccion MAC")
