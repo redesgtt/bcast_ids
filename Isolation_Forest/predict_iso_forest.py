@@ -88,8 +88,8 @@ def predict_dataset_if(dataset, filename):
 
 if __name__ == '__main__':
     text_help= "Script para realizar la prediccion del modelo Isolation Forest entrenado."
-    text_help += "\n\t./predict_iso_forest.py -s \"000ffec58a53;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\""
-    text_help += "\n\t./predict_iso_forest.py -s \"000ffec58a53;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\" -m modelo.bin"
+    text_help += "\n\t./predict_iso_forest.py -s \"000fxxxxxxx;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\""
+    text_help += "\n\t./predict_iso_forest.py -s \"000fxxxxxxx;254;0;0;254;253;0;1;0;0;0;0;0;0;0;0;0\" -m modelo.bin"
     text_help += "\n\t./predict_iso_forest.py -d dataset30.csv"
     text_help += "\n\t./predict_iso_forest.py -d dataset30.csv -m modelo.bin"
     text_help += "\nSALIDA"
