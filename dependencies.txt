@@ -1,2 +1,5 @@
 dpkt
 psutil
+numpy
+pandas
+sklearn
