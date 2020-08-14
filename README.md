@@ -40,7 +40,7 @@ The training dataset can be collected from a real-world connected environment. A
 | ETH_RESTO  | Total ETHERNET traffic generated from a specific MAC address  |
 | ARP_noIP  | Total ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
 
-Once the features were determined for the Machine Learning, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
+Once the features were determined for the Machine Learning algorithm, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
 
 ## Running the BCAST_IDS
 ### Prerequisites
