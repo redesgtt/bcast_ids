@@ -31,13 +31,13 @@ The training dataset can be collected from a real-world connected environment. A
 | ARPpb  | Total ARP Probe traffic generated from a specific MAC address  |
 | ARPan  | Total ARP Announcement traffic generated from a specific MAC address  |
 | ARPgr  | Total ARP Gratitous traffic generated from a specific MAC address  |
-| IPF  | Total ARP Request to an IP address which exists generated from a specific MAC address  |
+| IPF  | Total ARP Request generated from a specific MAC address to an IP address which exists   |
 | IP_ICMP  | Total IP ICMP traffic generated from a specific MAC address  |
 | IP_UDP  | Total IP UDP traffic generated from a specific MAC address  |
 | IP_TCP  | Total IP TCP traffic generated from a specific MAC address  |
 | IP_RESTO  | Other traffic generated from a specific MAC address  |
 | IPv6  | Total IPv6 traffic generated from a specific MAC address  |
 | ETH_RESTO  | Total ETHERNET traffic generated from a specific MAC address  |
-| ARP_noIP  | Total ARP Request to an IP address which does not exist generated from a specific MAC address  |
+| ARP_noIP  | Total ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
 
 Once the features were determined for machine learning, the next step is to generate the dataset. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attackt types and attack-free circumstances. 
