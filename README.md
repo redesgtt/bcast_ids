@@ -9,9 +9,9 @@ Machine Learning and Data Mining techniques work by establishing an implicit or 
 This algorithm is built on the basis of decision trees and the main idea of identifying normal and abnormal activity is in the path length of the tree. A normal point requires more partitions to be identified than abnormal point.
 
 There are three phases to make this project comes true:
-1. Preprocessing: feature selection and feature extraction. The data instances that are colleted from the network environment are structured.
-2. Training: the Machine Learning algorithm is used and extracts patterns from the data collected previously. Then, a system model is built.
-3. Detection: the monitored traffic data will be used as system input to be compared to the generated system model. If the pattern of the observation is matched with an existing threat, an alarm will be triggered and it will indicate a feasible network intrusion.
+1. **Preprocessing:** feature selection and feature extraction. The data instances that are colleted from the network environment are structured.
+2. **Training:** the Machine Learning algorithm is used and extracts patterns from the data collected previously. Then, a system model is built.
+3. **Detection:** the monitored traffic data will be used as system input to be compared to the generated system model. If the pattern of the observation is matched with an existing threat, an alarm will be triggered and it will indicate a feasible network intrusion.
 
 The following picture represents an overview of the BCAST_IDS architecture:
 
