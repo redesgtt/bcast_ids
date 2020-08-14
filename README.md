@@ -1,9 +1,9 @@
-# BCAST_IDS: A Network Intrusion Detection System
-
+# BCAST_IDS: A Network Intrusion Detection System with Machine Learning
+*Gestión Tributaria Territorial (GTT), Network dept., Alicante (Spain), 2020*
 ## Abstract
 Network intrusion is a threat with severe impacts, which can damage in several ways to network infrastructures and digital assets in the well-known cyberspace. A modern technique most commonly employed to combat network intrusion is the development of attack detection systems using Machine Learning and Data Mining. These approaches can help to protect networks because they are able to identify and disconnect malicious network traffic. BCAST_IDS is a Network Intrusion Detection System (NIDS), which attempts to identify unauthorized and anomalous behaviour in a Local Area Network. For that, it monitors network activity on one network segment. Then, the system constantly performs analysis and watches for certain traffic patterns. If the detected traffic patterns match the defined policies in the Machine Learning model, a security alert is generated.
 
-## Machine Learning in BCAST_IDS
+## Description
 Machine Learning and Data Mining techniques work by establishing an implicit or explicit model which enables to categorize the analized patterns. Since the network intrusion and Malware activity can be considered as anomalies, the system uses an algorithm that explicitly identifies anomalies (outliers) called **Isolation Forest**. In principle, outliers are less frequent than regular observations and are different from them in terms of values (they lie further away from the regular observations in the feature space). 
 
 This algorithm is built on the basis of decision trees and the main idea of identifying normal and abnormal activity is in the path length of the tree. A normal point requires more partitions to be identified than abnormal point.
@@ -40,9 +40,19 @@ The training dataset can be collected from a real-world connected environment. A
 | ETH_RESTO  | Total ETHERNET traffic generated from a specific MAC address  |
 | ARP_noIP  | Total ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
 
-Once the features were determined for machine learning, the next step is to generate the dataset. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
+Once the features were determined for the Machine Learning, the next step is to generate the dataset. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
 
-#### Dataset Generation and Preprocessing using the BCAST_IDS
+## Running the BCAST_IDS
+### Prerequisites
+You have to install **`Python 3`** (or higher) and the following libraries using the `pip` installer:
+
+```
+dpkt, psutil, numpy, pandas, sklearn, binascii, sys, csv, json, os, time, pickle, argparse, psutil, datetime, itertools 
+
+```
+If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts.
+
+### Configuration files
 The steps that we have to do in order to generate the dataset are:
 
 1. Edit the `config.txt` and fill up the variables on your own:
