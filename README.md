@@ -1,4 +1,4 @@
-# BCAST_IDS: The Network Intrusion Detection System in Local Area Networks
+# BCAST_IDS: A Network Intrusion Detection System
 
 ## Abstract
 Network intrusion is a threat with severe impacts, which can damage in several ways to network infrastructures and digital assets in the common cyberspace. A modern technique most commonly employed to combat network intrusion is the development of attack detection systems using Machine Learning and Data Mining. These approaches can help to protect networks because they are able to identify and disconnect malicious network traffic. BCAST_IDS is a Network Intrusion Detection System (NIDS), which attempts to identify unauthorized and anomalous behaviour in a Local Area Network. For that, it monitors network activity on one network segment. Then, the system constantly performs analysis and watches for certain traffic patterns. If the detected traffic patterns match the defined policies in the Machine Learning model, a security alert is generated.
