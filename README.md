@@ -53,9 +53,7 @@ dpkt, psutil, numpy, pandas, sklearn, binascii, sys, csv, json, os, time, pickle
 If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts.
 
 ### Configuration files
-The steps that we have to do in order to generate the dataset are:
-
-1. Edit the `config.txt` and fill up the variables on your own:
+Edit the `config.txt` and fill up the variables on your own:
 ```
 FILENAME='dataset'
 POST=10
