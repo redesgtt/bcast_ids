@@ -1,13 +1,13 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.6
 
-#########################################################################
-#                               BCAST_IDS
-#                             LITE VERSION
+##############################################################################################
+#                        BCAST_IDS: A NETWORK INTRUSION DETECTION SYSTEM
+#                                      LITE VERSION
 #
-#                             Dpto de Redes
-#                    Gestion Tributaria Territorial
-#                                 2020
-#########################################################################
+#                                      Dpto de Redes
+#                               Gestion Tributaria Territorial
+#                                           2020
+##############################################################################################
 
 import binascii
 import dpkt
@@ -428,8 +428,7 @@ def check_macs():
         datos_json = load_json(dir)
         for mac_captura in macs_captura:
             if mac_captura not in datos_json:
-                #print(f"ALERTA! La MAC {mac_captura} NO esta en el json {dir}.")
-                pass
+                print(f"ALERTA! Se ha detectado nueva MAC en la red ({mac_captura})")
 
 """Para obtener las primeras n MACs de mas actividad de la captura"""
 def take(n, iterable):
@@ -452,6 +451,47 @@ def save_cap(macs_atacando):
             os.mkdir(path_mac, access_rights)
         c = "cp " + str(sys.argv[1]) + " " + path_mac + str(d) +".cap"
         os.system(c)
+
+
+
+"""Funcion que invoca al Random/Isolation Forest para realizar la prediccion si una MAC ha cometido un ataque.
+   Se analizan las primeras 5 MACs que tienen una mayor actividad.
+   Tambien se envian valores a Nagios para su representacion Grafica en Dashboards > Banana
+   Si el algoritmo detecta un ataque; envia un correo electronico al dept. de redes y guarda la captura en directorio /forensic"""
+def run_IA():
+    if os.path.isfile('./predict_iso_forest.py') and os.path.isfile('./model_iso_forest.bin'):
+        macs_atacando = []
+        order_dict= dict()
+        for key, value in sorted(mac_line.items(), key=lambda item: item[1][0], reverse=True):
+            order_dict[key]=value
+
+        n_items = take(5, order_dict.items())
+
+        # Creamos la cadena de entrada para el script de prediccion(c): mac;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;LIPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP
+        for key, value in n_items.items():
+            a = key + ";"
+            b =';'.join(map(str,value))
+            c = a+b
+
+            result_predict = os.system("./predict_iso_forest.py -s" + '"' + c + '"' + "> output_predict.txt") #ISOLATION FOREST
+
+            si_output = read_txt("output_predict.txt")
+            s_output = si_output[1:-2]
+
+            # El algoritmo Isolation Forest tiene como salida -1 en caso de que haya un ataque
+            if s_output == str(-1):
+                macs_atacando.append(key)
+
+        # Si hay ataque, mostramos las MACs que se encuentran atacando y realizamos una llamada a Nagios.
+        if macs_atacando:
+        
+            #Guardamos captura de la MAC atacante
+            save_cap(macs_atacando)
+
+            # Realizamos un DROP de la MAC en el switch correspondiente:
+            for mac_atacando in macs_atacando:
+                print("f MAC {mac_atacando} atacando!")
+
 
 if __name__ == '__main__':
 
@@ -489,3 +529,6 @@ if __name__ == '__main__':
 
     # Generamos fichero de MACs censadas en 1 mes
     generate_file('./tm-month.json', tm, AGING4)
+
+    # Aplicamos algoritmo IA
+    run_IA()
