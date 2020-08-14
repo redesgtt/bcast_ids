@@ -1,7 +1,7 @@
 # BCAST_IDS: A Network Intrusion Detection System
 
 ## Abstract
-Network intrusion is a threat with severe impacts, which can damage in several ways to network infrastructures and digital assets in the common cyberspace. A modern technique most commonly employed to combat network intrusion is the development of attack detection systems using Machine Learning and Data Mining. These approaches can help to protect networks because they are able to identify and disconnect malicious network traffic. BCAST_IDS is a Network Intrusion Detection System (NIDS), which attempts to identify unauthorized and anomalous behaviour in a Local Area Network. For that, it monitors network activity on one network segment. Then, the system constantly performs analysis and watches for certain traffic patterns. If the detected traffic patterns match the defined policies in the Machine Learning model, a security alert is generated.
+Network intrusion is a threat with severe impacts, which can damage in several ways to network infrastructures and digital assets in the well-known cyberspace. A modern technique most commonly employed to combat network intrusion is the development of attack detection systems using Machine Learning and Data Mining. These approaches can help to protect networks because they are able to identify and disconnect malicious network traffic. BCAST_IDS is a Network Intrusion Detection System (NIDS), which attempts to identify unauthorized and anomalous behaviour in a Local Area Network. For that, it monitors network activity on one network segment. Then, the system constantly performs analysis and watches for certain traffic patterns. If the detected traffic patterns match the defined policies in the Machine Learning model, a security alert is generated.
 
 ## Machine Learning in BCAST_IDS
 Machine Learning and Data Mining techniques work by establishing an implicit or explicit model which enables to categorize the analized patterns. Since the network intrusion and Malware activity can be considered as anomalies, the system uses an algorithm that explicitly identifies anomalies (outliers) called **Isolation Forest**. In principle, outliers are less frequent than regular observations and are different from them in terms of values (they lie further away from the regular observations in the feature space). 
@@ -15,10 +15,10 @@ There are three phases to make this project comes true:
 
 The following picture represents an overview of the BCAST_IDS architecture:
 
-[picture]
+![alt text](https://user-images.githubusercontent.com/69505347/89898449-0b2f5f80-dbe1-11ea-9158-b689bfaf4e41.png)
 
 ### Dataset Generation and Preprocessing
-The training dataset can be collected from a real-world connected environment. At this point, the importante features have to be identified. There are a whole bunch of features that can be monitored by networking tools for network analysis over the network, but some of them coukd be redundant. In particular, we have selected fifteen features and are listed in the next table:
+The training dataset can be collected from a real-world connected environment. At this point, the importante features have to be identified. There are a whole bunch of features that can be monitored by networking tools for network analysis over the network, but some of them could be redundant. In particular, we have selected fifteen features and are listed below:
 
 | Feature  | Description |
 | ------------- | ------------- |
@@ -40,4 +40,27 @@ The training dataset can be collected from a real-world connected environment. A
 | ETH_RESTO  | Total ETHERNET traffic generated from a specific MAC address  |
 | ARP_noIP  | Total ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
 
-Once the features were determined for machine learning, the next step is to generate the dataset. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attackt types and attack-free circumstances. 
+Once the features were determined for machine learning, the next step is to generate the dataset. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
+
+#### Dataset Generation and Preprocessing using the BCAST_IDS
+The steps that we have to do in order to generate the dataset are:
+
+1. Edit the `config.txt` and fill up the variables on your own:
+```
+FILENAME='dataset'
+POST=10
+IFACE2=eth1
+NET="192.168"
+EXCLUDE_MACS=""
+```
+| Variable  | Description |
+| ------------- | ------------- |
+| FILENAME  | Name of the dataset  |
+| POST  | Time interval traffic monitoring  |
+| IFACE2  | Interface where your computer is connected to your network  |
+| NET  | Network range  |
+| EXCLUDE_MACS  | MAC addresses to exclude (i.e. the default gateway)  |
+
+2. Execute `./post.sh`. If you want to run it at the background you can write this command `./post.sh &`
+
+3. The dataset is now generating. Type `tail -f dataset.csv` in the command prompt to observe it.
