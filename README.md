@@ -76,13 +76,13 @@ EXCLUDE_MACS=""
 #### Preprocessing
 1. Execute the command `./post.sh` at the command prompt. If you want to run it at the background you can write this command `./post.sh &`.
 2. The dataset is now generating. Type `tail -f dataset.csv` at the command prompt to observe it. 
-3. It is time to make some kind of cyberattacks. If you are in a Wifi network, try to download any application in order to make outliers in the data. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). You can perform cyberattacks with `nmap, arp-scan, netdiscover...` using a computer too. Make sure that this computer and BCAST_IDS are connected in the same network.
-4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the file has 10.000-12.000 entries.
+3. It is time to make some kind of cyberattacks. If you are in a Wifi network, try to download any network scanning tool in order to make outliers in the data. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). You can perform cyberattacks with `nmap, arp-scan, netdiscover...` using a computer too. Make sure that this computer and BCAST_IDS are connected in the same network.
+4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the file has 10.000-12.000 lines.
 5. Then, stop `./post.sh`.
 
 #### Training
-1. Use the script `./train_iso_forest.py` to extracts patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Remember that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm.
-2. Soon afterward, a model will be generated with the name `./model_iso_forest.py`.
+1. Use the script `./train_iso_forest.py` to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Remember that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm.
+2. Soon afterward, a model will be generated with the name `model_iso_forest.bin`.
 3. Make some tests with the script `./predict_iso_forest.py` and verify the effectiveness of the Isolation Forest algorithm.
 
 #### Detection
