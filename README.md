@@ -1,7 +1,7 @@
 # BCAST_IDS: A Network Intrusion Detection System with Machine Learning
 *Gestión Tributaria Territorial (GTT), Network dept., Alicante (Spain), 2020*
 ## Abstract
-Network intrusion is a growing threat with severe impacts, which can damage in several ways to network infrastructures and digital assets in the well-known cyberspace. A modern technique employed to combat against network intrusion is the development of attack detection systems using Machine Learning and Data Mining. These approaches can help to protect networks because they are able to identify and disconnect malicious network traffic. BCAST_IDS is a Network Intrusion Detection System (NIDS), which attempts to identify unauthorized and anomalous behaviour in a Local Area Network (LAN) looking at the broadcast traffic. For that, it monitors network activity on one network segment. Then, the system constantly performs analysis and watches for certain traffic patterns. If the detected traffic patterns match the defined policies in the Machine Learning model, a security alert will be generated.
+Network intrusion is a growing threat with severe impacts, which can damage in several ways to network infrastructures and digital assets in the well-known cyberspace. A modern technique employed to combat against network intrusion is the development of attack detection systems using Machine Learning and Data Mining. These approaches can help to protect networks because they are able to identify and disconnect malicious network traffic. BCAST_IDS is a Network Intrusion Detection System (NIDS), which attempts to identify unauthorized and anomalous behaviour in a Local Area Network (LAN) looking at the broadcast and unicast traffic. For that, it monitors network activity on one network segment. Then, the system constantly performs analysis and watches for certain traffic patterns. If the detected traffic patterns match the defined policies in the Machine Learning model, a security alert will be generated.
 
 ## Description
 Machine Learning and Data Mining techniques work by establishing an implicit or explicit model which enables to categorize the analized patterns. Since network intrusion and Malware activities can be considered as anomalies (outliers), BCAST_IDS uses an algorithm, called [**Isolation Forest**](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html), that explicitly identifies them. In principle, outliers are less frequent than regular observations and are different from them in terms of values (they lie further away from the regular observations in the feature space). 
@@ -44,7 +44,7 @@ Once the features were determined to fed the Isolation Forest algorithm, the nex
 
 ## Running the BCAST_IDS
 ### Hardware Prerequisites
-Raspberry Pi or PC with Linux (Debian, Ubuntu, CentOS, Fedora...) connected in LAN or any Wifi network in promiscuous mode.
+Raspberry Pi or PC with Linux (Debian, Ubuntu, CentOS, Fedora...) connected in LAN or any Wifi network.
 
 ### Software Prerequisites
 You have to install **`Python 3`** (or higher) and the following libraries using the `pip` installer:
@@ -53,7 +53,7 @@ You have to install **`Python 3`** (or higher) and the following libraries using
 dpkt, psutil, numpy, pandas, sklearn, binascii, sys, csv, json, os, time, pickle, argparse, psutil, datetime, itertools 
 
 ```
-If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts.
+If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts. Moreover, `git` must be installed in your computer.
 
 ### Configuration files
 Edit the `config.txt` and fill up the variables on your own:
@@ -73,8 +73,16 @@ EXCLUDE_MACS=""
 | EXCLUDE_MACS  | MAC addresses to exclude (i.e. the default gateway)  |
 
 ### Run the Project
+
+#### Download
+
+```
+git clone https://github.com/redesgtt/bcast_ids.git
+
+```
+
 #### Preprocessing
-1. Execute the command `./post.sh` at the command prompt. If you want to run it at the background you can write this command `./post.sh &`.
+1. Open the folder bcast_ids and execute the command `./post.sh` at the command prompt. If you want to run it at the background you can write this command `./post.sh &`.
 2. The dataset is now generating. Type `tail -f dataset.csv` at the command prompt to observe it. 
 3. It is time to make some kind of cyberattacks. If you are in a Wifi network, try to download any network scanning tool in order to make outliers in the data. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). You can perform cyberattacks with `nmap, arp-scan, netdiscover...` using a computer too. Make sure that this computer and BCAST_IDS are connected in the same network.
 4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the file has 10.000-12.000 lines.
