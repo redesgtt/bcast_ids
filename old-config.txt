@@ -1,0 +1,5 @@
+FILENAME='dataset'
+POST=10
+IFACE2=eth1
+NET="192.168.0"
+EXCLUDE_MACS=""

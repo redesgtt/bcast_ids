@@ -1,5 +1,31 @@
+#####################################################################################
+#
+#                         BCAST_IDS CONFIGURATION FILE
+#
+#####################################################################################
+
+# POST.SH
 FILENAME='dataset'
 POST=10
-IFACE2=eth1
-NET="192.168.0"
+IFACE2=ens2
+
+# BCAST_IDS_LITE
+BANANA=Dirac
+NET=9.56
 EXCLUDE_MACS=""
+NUM_MACS_TO_ANALIZE=5
+## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json
+UPDATE_TIME_JSON_HOUR=1800
+## Update time ipm.json
+UPDATE_TIME_JSON_12HOURS=43200
+## Update time tips-week.json
+UPDATE_TIME_JSON_WEEK=604800
+## Update time tm-month.json
+UPDATE_TIME_JSON_MONTH=2592000
+
+## Allow sending emails from BCAST_IDS (enable/disable) 
+SEND_EMAIL=enable
+MAIL_SERVER=correo.gtt.es
+PORT_MAIL_SERVER=25
+SENDER_EMAIL=banana_dirac@gtt.es
+RECEIVERS_EMAIL=jgombao_log@gtt.es
