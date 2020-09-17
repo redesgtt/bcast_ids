@@ -50,8 +50,7 @@ Raspberry Pi or PC with Linux (Debian, Ubuntu, CentOS, Fedora...) connected in L
 You have to install **`Python 3`** (or higher) and the following libraries using the `pip` installer:
 
 ```
-dpkt, psutil, numpy, pandas, sklearn, binascii, sys, csv, json, os, time, pickle, argparse, psutil, datetime, itertools 
-
+ numpy pandas sklearn email smtplib binascii dpkt sys csv json os time pickle json argparse psutil datetime itertools
 ```
 If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts. Moreover, `git` must be installed in your computer.
 
