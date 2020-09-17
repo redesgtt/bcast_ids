@@ -509,7 +509,7 @@ def run_IA():
                 print("No se envia correos")
 
             for mac_atacando in macs_atacando:
-                print(f"MAC {mac_atacando} atacando!")
+                #print(f"MAC {mac_atacando} atacando!")
                 #print(f"ALERTA! Se ha detectado nueva MAC en la red ({mac_captura})")
                 f = open("macs_abnormal_act.log", "a")
                 f.write(f"{dia} {hora} - {mac_atacando}\n")
@@ -608,40 +608,25 @@ def send_email(*args):
 
 
     ## Log in to server using secure context and send email
-    #try:
-    #    for receiver_email in receivers_email:
-    #        message = MIMEMultipart()
-    #        message["From"] = sender_email
-    #        message["To"] = receiver_email
-    #        message["Subject"] = subject
+    try:
+        for receiver_email in receivers_email:
+            message = MIMEMultipart()
+            message["From"] = sender_email
+            message["To"] = receiver_email
+            message["Subject"] = subject
 
-    #        if attachment_pcap:
-    #            message.attach(part)
+            if attachment_pcap:
+                message.attach(part)
 
             # Add body to email
-    #        message.attach(MIMEText(body, "plain"))
+            message.attach(MIMEText(body, "plain"))
 
-    #        text = message.as_string()
-    #        with smtplib.SMTP(mail_server, port_mail_server) as server:
-    #            server.sendmail(sender_email, receiver_email, text)
-    #            print("Se ha enviado el correo")
-    #except:
-    #    print("El correo no se ha enviado")
-    for receiver_email in receivers_email:
-        message = MIMEMultipart()
-        message["From"] = sender_email
-        message["To"] = receiver_email
-        message["Subject"] = subject
-
-        if attachment_pcap:
-            message.attach(part)
-
-        # Add body to email
-        message.attach(MIMEText(body, "plain"))
-
-        text = message.as_string()
-        with smtplib.SMTP(mail_server, port_mail_server) as server:
-            server.sendmail(sender_email, receiver_email, text)
+            text = message.as_string()
+            with smtplib.SMTP(mail_server, port_mail_server) as server:
+                server.sendmail(sender_email, receiver_email, text)
+                print("Se ha enviado el correo")
+    except:
+        print("El correo no se ha enviado")
 
 
 if __name__ == '__main__':
