@@ -117,6 +117,7 @@ git clone https://github.com/redesgtt/bcast_ids.git
 3. It is time to make some kind of cyberattacks. If you are in a Wifi network, try to download any network scanning tool in order to make outliers in the data. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). You can perform cyberattacks with `nmap, arp-scan, netdiscover...` using a computer too. Make sure that this computer and BCAST_IDS are connected in the same network.
 4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the file has 10.000-12.000 lines.
 6. At the same time, you can also see the .json files. Their time expiration can be modified in config.txt file through `UPDATE_TIME_JSON_HOUR`, `UPDATE_TIME_JSON_12HOURS`, `UPDATE_TIME_JSON_WEEK` and `UPDATE_TIME_JSON_MONTH` properties.
+
 | JSON  | Description |
 | ------------- | ------------- |
 | `tip.json`  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. |
@@ -127,6 +128,26 @@ git clone https://github.com/redesgtt/bcast_ids.git
 | `ipm.json`  |  {MAC source:IP_source}. |
 | `tips-week.json`  | {IP source:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. It has a week expiration by default. |
 | `tm-month.json`  | {MAC source:time}. Active source MACs which have a month expiration by default. |
+
+| Variable  | Description |
+| ------------- | ------------- |
+| `tip.json`  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file.  |
+| `POST`  | Time interval traffic monitoring  |
+| `IFACE2`  | Interface where your computer is connected to your network  |
+| `BANANA`  | PC name  |
+| `NET`  | Network range  |
+| `EXCLUDE_MACS`  | MAC addresses to exclude (i.e. the default gateway). If there are two or more, they should separate by ',' i.e. MAC1,MAC2 |
+| `NUM_MACS_TO_ANALIZE`  | Number of MACs to predict their activities. Three possible values: **number**, **'auto'** (it takes the first 20% top activity MACs) and **'none'** (the Machine Learning algorithm analyze all MACs seen in each network capture) |
+| `UPDATE_TIME_JSON_HOUR`  | Time to update tip.json, tm.json, externos.json, ti6.json, ipf.json |
+| `UPDATE_TIME_JSON_12HOURS`  | Time to update ipm.json |
+| `UPDATE_TIME_JSON_WEEK`  | Time to update tips-week.json |
+| `UPDATE_TIME_JSON_MONTH`  | Time to update tm-month.json |
+| `SEND_EMAIL`  | Enable or disable to send emails |
+| `MAIL_SERVER`  | Mail server name |
+| `PORT_MAIL_SERVER`  | Port mail server |
+| `SENDER_EMAIL`  | Sender email |
+| `RECEIVERS_EMAIL`  | Receivers mail. If there are two or more, they should separate by ',' i.e. mail1@tesbcast.com,mail2@tesbcast.com  |
+
 5. Then, in order to train you can stop the `./post.sh` executable.
 
 #### Training
@@ -135,5 +156,5 @@ git clone https://github.com/redesgtt/bcast_ids.git
 3. Make some tests with the script `./predict_iso_forest.py` and verify the effectiveness of the Isolation Forest algorithm.
 
 #### Detection
-1. Execute again `./post.sh`. Now, the BCAST_IDS should be running perfectly on your computer or RaspberryPi and detect anomalies in your network! If the algorithm detects any abnormal activity, it will be registered at `./macs_abnormal_act.log`. Moreover if the system detects a new MAC in the network, it will be registered at `./new_macs_detected.log`
+1. Execute again `./post.sh`. Now, the BCAST_IDS should be running perfectly on your computer or RaspberryPi and detect anomalies in your network! If the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover if the system detects a new MAC in the network, it will be registered at `new_macs_detected.log`
 2. If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `enable` and complete the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own.
