@@ -58,6 +58,8 @@ If the Python v3 scripts fail, try to view the location of your Python package i
 Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian calendar**:
 ```
 # POST.SH
+## Allow to generate a dataset (enable/disable)
+GENERATE_DATASET=enable
 FILENAME='dataset'
 POST=10
 IFACE2=eth1
