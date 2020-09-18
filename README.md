@@ -87,6 +87,7 @@ The meaning of each property is detailed below:
 
 | Variable  | Description |
 | ------------- | ------------- |
+| `GENERATE_DATASET`  | Allow to generate a dataset (enable/disable). |
 | `FILENAME`  | Name of the dataset. |
 | `POST`  | Time interval traffic monitoring. |
 | `IFACE2`  | Interface where your computer is connected to your network.  |
