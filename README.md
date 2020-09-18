@@ -120,33 +120,15 @@ git clone https://github.com/redesgtt/bcast_ids.git
 
 | JSON  | Description |
 | ------------- | ------------- |
-| `tip.json`  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. |
-| `tm.json`  | {MAC source:time}. Active source MACs.  |
-| `externos.json`  | {IP source:time}. Active source IPs which do not belong to the network range specified in the 'NET' attribute of the config file.  |
-| `ti6.json`  | {MAC source:time}. Active source IPs (v.6). |
-| `ipf.json`  | {IP source_IP destination:time}. ARP trafic between two existing IPs which belong to the network range specified in the 'NET' attribute of the config file|
-| `ipm.json`  |  {MAC source:IP_source}. |
-| `tips-week.json`  | {IP source:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. It has a week expiration by default. |
-| `tm-month.json`  | {MAC source:time}. Active source MACs which have a month expiration by default. |
+| **tip.json**  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. |
+| **tm.json**  | {MAC source:time}. Active source MACs.  |
+| **externos.json**  | {IP source:time}. Active source IPs which do not belong to the network range specified in the 'NET' attribute of the config file.  |
+| **ti6.json**  | {MAC source:time}. Active source IPs (v.6). |
+| **ipf.json**  | {IP source_IP destination:time}. ARP trafic between two existing IPs which belong to the network range specified in the 'NET' attribute of the config file|
+| **ipm.json**  |  {MAC source:IP_source}. |
+| **tips-week.json**  | {IP source:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. It has a week expiration by default. |
+| **tm-month.json**  | {MAC source:time}. Active source MACs which have a month expiration by default. |
 
-| Variable  | Description |
-| ------------- | ------------- |
-| `tip.json`  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file.  |
-| `POST`  | Time interval traffic monitoring  |
-| `IFACE2`  | Interface where your computer is connected to your network  |
-| `BANANA`  | PC name  |
-| `NET`  | Network range  |
-| `EXCLUDE_MACS`  | MAC addresses to exclude (i.e. the default gateway). If there are two or more, they should separate by ',' i.e. MAC1,MAC2 |
-| `NUM_MACS_TO_ANALIZE`  | Number of MACs to predict their activities. Three possible values: **number**, **'auto'** (it takes the first 20% top activity MACs) and **'none'** (the Machine Learning algorithm analyze all MACs seen in each network capture) |
-| `UPDATE_TIME_JSON_HOUR`  | Time to update tip.json, tm.json, externos.json, ti6.json, ipf.json |
-| `UPDATE_TIME_JSON_12HOURS`  | Time to update ipm.json |
-| `UPDATE_TIME_JSON_WEEK`  | Time to update tips-week.json |
-| `UPDATE_TIME_JSON_MONTH`  | Time to update tm-month.json |
-| `SEND_EMAIL`  | Enable or disable to send emails |
-| `MAIL_SERVER`  | Mail server name |
-| `PORT_MAIL_SERVER`  | Port mail server |
-| `SENDER_EMAIL`  | Sender email |
-| `RECEIVERS_EMAIL`  | Receivers mail. If there are two or more, they should separate by ',' i.e. mail1@tesbcast.com,mail2@tesbcast.com  |
 
 5. Then, in order to train you can stop the `./post.sh` executable.
 
