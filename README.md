@@ -55,7 +55,7 @@ dpkt psutil numpy pandas sklearn
 If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts. Moreover, `git` must be installed in your computer.
 
 ### Configuration files
-Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian format**:
+Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian calendar**:
 ```
 # POST.SH
 FILENAME='dataset'
