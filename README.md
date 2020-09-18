@@ -57,19 +57,50 @@ If the Python v3 scripts fail, try to view the location of your Python package i
 ### Configuration files
 Edit the `config.txt` and fill up the variables on your own:
 ```
+# POST.SH
 FILENAME='dataset'
 POST=10
 IFACE2=eth1
-NET="192.168"
+
+# BCAST_IDS_LITE
+BANANA=MiPC
+NET=192.168.0
 EXCLUDE_MACS=""
+NUM_MACS_TO_ANALIZE=5
+## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json
+UPDATE_TIME_JSON_HOUR=1800
+## Update time ipm.json
+UPDATE_TIME_JSON_12HOURS=43200
+## Update time tips-week.json
+UPDATE_TIME_JSON_WEEK=604800
+## Update time tm-month.json
+UPDATE_TIME_JSON_MONTH=2592000
+
+## Allow sending emails from BCAST_IDS (enable/disable) 
+SEND_EMAIL=disable
+MAIL_SERVER=
+PORT_MAIL_SERVER=25
+SENDER_EMAIL=
+RECEIVERS_EMAIL=
 ```
 | Variable  | Description |
 | ------------- | ------------- |
 | FILENAME  | Name of the dataset  |
 | POST  | Time interval traffic monitoring  |
 | IFACE2  | Interface where your computer is connected to your network  |
+| BANANA  | PC name  |
 | NET  | Network range  |
-| EXCLUDE_MACS  | MAC addresses to exclude (i.e. the default gateway)  |
+| EXCLUDE_MACS  | MAC addresses to exclude (i.e. the default gateway). If there are two or more, they should separate by ',' i.e. MAC1,MAC2 |
+| NUM_MACS_TO_ANALIZE  | Number of MACs to predict their activities. Three possible values: **number**, **'auto'** (it takes the first 20% top activity MACs) and **'none'** (the Machine Learning algorithm analyze all MACs seen in each network capture) |
+| UPDATE_TIME_JSON_HOUR  | Time to update tip.json, tm.json, externos.json, ti6.json, ipf.json |
+| UPDATE_TIME_JSON_12HOURS  | Time to update ipm.json |
+| UPDATE_TIME_JSON_WEEK  | Time to update tips-week.json |
+| UPDATE_TIME_JSON_MONTH  | Time to update tm-month.json |
+| SEND_EMAIL  | Enable to send emails |
+| MAIL_SERVER  | Mail server name |
+| PORT_MAIL_SERVER  | Port mail server |
+| SENDER_EMAIL  | Sender email |
+| RECEIVERS_EMAIL  | Receivers mail. If there are two or more, they should separate by ',' i.e. mail1@tesbcast.com,mail2@tesbcast.com  |
 
 ### Run the Project
 
