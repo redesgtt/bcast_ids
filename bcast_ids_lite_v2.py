@@ -1,4 +1,4 @@
-#!/usr/bin/python3.6
+#! /usr/bin/env python3
 
 ##############################################################################################
 #                        BCAST_IDS: A NETWORK INTRUSION DETECTION SYSTEM
@@ -412,7 +412,8 @@ def mac_lines(pcap):
                 l[15] = len(values_nip)
 
     # Imprimimos las lineas para generar el DATASET
-    print_mac_line()
+    if configFile_value.get('GENERATE_DATASET') == 'enable':
+        print_mac_line()
 
 
 """Generamos las lineas del dataset con formato. Ordenamos de mas actividad a menor actividad."""

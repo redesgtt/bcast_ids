@@ -5,6 +5,8 @@
 #####################################################################################
 
 # POST.SH
+## Allow to generate a dataset (enable/disable)
+GENERATE_DATASET=enable
 FILENAME='dataset'
 POST=10
 IFACE2=eth1
