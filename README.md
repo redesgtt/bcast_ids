@@ -47,7 +47,7 @@ Once the features were determined to fed the Isolation Forest algorithm, the nex
 Raspberry Pi or PC with Linux (Debian, Ubuntu, CentOS, Fedora...) connected in LAN or any Wifi network.
 
 ### Software Prerequisites
-You have to install **`Python 3`** (or higher)
+BCAST_IDS requires **`Python 3` branch**
 
 ### Configuration files
 Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian calendar**:
