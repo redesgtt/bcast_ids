@@ -118,8 +118,8 @@ pip3 install -r requirements.txt
 Wait for the requirements to download, it may take a while. Once they are downloaded, you are good to go!
 
 #### Preprocessing
-1. Execute `./post.sh` at the command prompt. If you want to run it at the background you can type `./post.sh &`. IMPORTANT: Make sure you are in a 'root' user.
-2. The dataset is now generating. Type `tail -f dataset.csv` at the command prompt to observe it. 
+1. Execute `./post.sh` in order to generate a dataset. Keep this script running. If you want to run it at the background you can type `./post.sh &`. IMPORTANT: Make sure you are in a 'root' user.
+2. The dataset is now generating and is growing over time. Type `tail -f dataset.csv` at the command prompt to observe it. 
 3. It is time to make some kind of cyberattacks. If you are in a Wifi network, try to download any network scanning tool in order to make outliers in the data. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). You can perform cyberattacks with `nmap, arp-scan, netdiscover...` using a computer too. Make sure that this computer and BCAST_IDS are connected in the same network.
 4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the file has 10.000-12.000 lines.
 6. At the same time, you can also see the .json files. Their time expiration can be modified in config.txt file through `UPDATE_TIME_JSON_HOUR`, `UPDATE_TIME_JSON_12HOURS`, `UPDATE_TIME_JSON_WEEK` and `UPDATE_TIME_JSON_MONTH` properties:
