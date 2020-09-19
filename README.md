@@ -47,12 +47,7 @@ Once the features were determined to fed the Isolation Forest algorithm, the nex
 Raspberry Pi or PC with Linux (Debian, Ubuntu, CentOS, Fedora...) connected in LAN or any Wifi network.
 
 ### Software Prerequisites
-You have to install **`Python 3`** (or higher) and the following libraries using the `pip` installer:
-
-```
-dpkt psutil numpy pandas sklearn
-```
-If the Python v3 scripts fail, try to view the location of your Python package installation with the command `which python3` o whichever version you have and then write it in the first line of the Python scripts. Moreover, `git` must be installed in your computer.
+You have to install **`Python 3`** (or higher)
 
 ### Configuration files
 Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian calendar**:
@@ -115,6 +110,12 @@ The meaning of each property is detailed below:
 git clone https://github.com/redesgtt/bcast_ids.git
 
 ```
+Then you need to install the basic dependencies to run the project on your system:
+```
+cd bcast_ids
+pip3 install -r requirements.txt
+```
+Wait for the requirements to download, it may take a while. Once they are downloaded, you are good to go!
 
 #### Preprocessing
 1. Open the bcast_ids folder and execute `./post.sh` at the command prompt. If you want to run it at the background you can type `./post.sh &`. IMPORTANT: Make sure you are in a 'root' user.
