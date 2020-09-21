@@ -507,7 +507,7 @@ def run_IA():
                 # Eviamos correo electronico
                 send_email_attack(macs_atacando)
             else:
-                print("No se envia correos")
+                print("No se envia correo")
 
             for mac_atacando in macs_atacando:
                 #print(f"MAC {mac_atacando} atacando!")
@@ -639,21 +639,28 @@ if __name__ == '__main__':
     f.close()
 
     # Generamos los ficheros JSON necesarios
-    generate_file('./tips-week.json', tip, AGING3)
-    generate_file('./tip.json', tip, AGING1)
-    generate_file('./tm.json', tm, AGING1)
-    generate_file('./externos.json', externos, AGING1)
-    generate_file('./ti6.json', ti6, AGING1)
-    generate_file('./ipm.json', ipm, AGING2)
+    if tip:
+        generate_file('./tips-week.json', tip, AGING3)
+        generate_file('./tip.json', tip, AGING1)
+    if tm:
+        generate_file('./tm.json', tm, AGING1)
+    if externos:
+        generate_file('./externos.json', externos, AGING1)
+    if ti6:
+        generate_file('./ti6.json', ti6, AGING1)
+    if ipm:
+        generate_file('./ipm.json', ipm, AGING2)
 
-    # Generamos diccionario de ipf
-    f = open(sys.argv[1],'rb')
-    pcap = dpkt.pcap.Reader(f)
-    ipf_nipf(pcap)
-    f.close()
+    if os.path.isfile('./tips-week.json'):
+        # Generamos diccionario de ipf
+        f = open(sys.argv[1],'rb')
+        pcap = dpkt.pcap.Reader(f)
+        ipf_nipf(pcap)
+        f.close()
 
     # Generamos fichero de asociacion de IPF:
-    generate_file('./ipf.json', ipf, AGING1)
+    if ipf:
+        generate_file('./ipf.json', ipf, AGING1)
 
     # Contabiliza el numero de paquetes de la captura por MAC:
     fa = open(sys.argv[1],'rb')
@@ -665,7 +672,8 @@ if __name__ == '__main__':
     check_macs()
 
     # Generamos fichero de MACs censadas en 1 mes
-    generate_file('./tm-month.json', tm, AGING4)
+    if tm:
+        generate_file('./tm-month.json', tm, AGING4)
 
     # Aplicamos algoritmo IA
     run_IA()
