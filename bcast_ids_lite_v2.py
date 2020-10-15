@@ -30,6 +30,7 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from predict_iso_forest import predict_capture
 
 """Guarda JSON"""
 def save_json(obj, name):
@@ -123,8 +124,8 @@ mac_line = dict()
 mac_nip = dict()
 # Diccionario de las MACs que han preguntado por direcciones IP que si que existen (peticiones ARP)
 mac_ipf = dict()
-
 ts = 0
+
 
 """Genera ficheros JSON: ipf, ipm, ti6, tip, tm"""
 def generate_file(dir, datos_captura, ag):
@@ -202,9 +203,12 @@ def generate_file(dir, datos_captura, ag):
                 save_json(dict(), dir)
 
 
+
 """Evita duplicidades en el IPF. Ej: 192.168.3.2_192.168.3.57 = 192.168.3.57_192.168.3.2"""
 def check_s(s):
     return(s.split('_')[1] + "_" + s.split('_')[0])
+
+
 
 """Funcion requerida para generar los valores de las tablas caches tip, ti6, ipm, externos y tip-week"""
 def active_caches(pcap):
@@ -305,10 +309,9 @@ def count_packets(*args):
     mac_dst = args[4]
     eth_type = args[5]
 
-    # Total de veces que ha aparecido la MAC
     attributes[0] += 1
 
-    #Tipo de direccionamiento: Unicast, Broadcast o Multicast
+    #UNICAST, BROADCAST MULTICAST (tipo de direccionamiento)
     ETH_MSB_IG = ord(payload[0:1])
     if  (ETH_MSB_IG & 1) == 0 :   # UCAST
         #print ("UCAST", mac_src,mac_dst,eth_type)
@@ -321,6 +324,7 @@ def count_packets(*args):
     elif (ETH_MSB_IG & 1) == 1:  # MCAST
         #print ("MCAST", mac_src,mac_dst,eth_type)
         attributes[2] += 1
+
     #ARP
     if eth_type == '0806':
         arp_opcode = binascii.hexlify(payload[20:22]).decode()
@@ -339,49 +343,66 @@ def count_packets(*args):
                 #print(mac_src, ip_src)
         elif arp_opcode == '0002' and mac_dst == 'ffffffffffff':
             attributes[7] += 1          # ARPgr
-        #IPv4
-        elif eth_type == '0800':
-            protocol = int(binascii.hexlify(payload[23:24]), 16)
-            ip_src = ip_addr(payload[26:30])
 
-            #UDP=17
-            if protocol == 17: attributes[10]+=1
+    #IPv4
+    elif eth_type == '0800':
+        protocol = int(binascii.hexlify(payload[23:24]), 16)
+        dst_port = int(binascii.hexlify(payload[36:38]), 16)
+        ip_src = ip_addr(payload[26:30])
+        ip_dst = ip_addr(payload[30:34])
 
-            # TCP=6
-            elif protocol == 6: attributes[11]+=1
+        #UDP=17
+        if protocol == 17:
+            attributes[10]+=1
 
-            # ICMP=1
-            elif protocol == 1: attributes[9]+=1
+            #SSDP
+            if dst_port == 1900 and ip_dst == '239.255.255.250':
+                attributes[16]+=1
 
-            # IP_RESTO
-            else: attributes[12]+=1
+        # TCP=6
+        elif protocol == 6: attributes[11]+=1
 
-            #IPv6
-        elif eth_type == '86dd': attributes[13]+=1
+        # ICMP=1
+        elif protocol == 1: attributes[9]+=1
 
-        #RESTO
-        else: attributes[14]+=1
+        # IP_RESTO
+        else: attributes[12]+=1
+
+    # IPv6
+    elif eth_type == '86dd':
+        #print("Trafico IPv6 detectado", mac_src)
+
+        # Contabilizamos paquetes IPv6
+        attributes[13]+=1
+
+        # Contabilizamos paquetes ICMPv6 (icmpv6_opcode == 00):
+        icmpv6_opcode = binascii.hexlify(payload[55:56]).decode()
+        if icmpv6_opcode == '00':
+            attributes[17]+=1
+    # RESTO
+    else: attributes[14]+=1
 
 
 """Lee el PCAP y contabiliza el numero de paquetes para generar el DATATSET:
-Formato: {mac : 'MACs, UCAST, MCAST, BCAST, ARPrq, ARPpb, ARPan, ARPgr, LIPF, IP_ICMP, IP_UDP, IP_TCP, IP_RESTO, IP6, RESTO, ARP_noIP'} """
+Formato: {mac : 'MACs, UCAST, MCAST, BCAST, ARPrq, ARPpb, ARPan, ARPgr, LIPF, IP_ICMP, IP_UDP, IP_TCP, IP_RESTO, IP6, RESTO, ARP_noIP, SSDP, ICMPv6'} """
 def mac_lines(pcap):
-    #excluye_macs = getValuesConfig("EXCLUYE_MACS")
     excluye_macs = configFile_value.get('EXCLUDE_MACS').split(",")
-    mac_ataque_dataset = ""
-    attributes = [0] * 16 # Inicializamos la lista de valores de cada MAC a 0
+    mac_ataque_dataset = "000ffec58a53"
+    num_attributes = 18
+    attributes = [0] * num_attributes # Inicializamos la lista de valores de cada MAC a 0
+    #print(attributes)
     for ts, payload in pcap:
         mac_src = binascii.hexlify(payload[6:12]).decode()
         mac_dst = binascii.hexlify(payload[0:6]).decode()
         eth_type = binascii.hexlify(payload[12:14]).decode()
 
         # Contabilizamos la cantidad de paquetes para cada direccion MAC
-        if mac_src in mac_line and mac_src not in excluye_macs:
+        if mac_src in mac_line:
             attributes = mac_line[mac_src]
             count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type)
         else:
-            if mac_src in ipm_subred and mac_src not in excluye_macs:
-                attributes = [0] * 16
+            if mac_src not in excluye_macs and mac_src in ipm_subred:
+                attributes = [0] * num_attributes
                 mac_line[mac_src] = attributes
                 count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type)
 
@@ -412,8 +433,9 @@ def mac_lines(pcap):
                 l[15] = len(values_nip)
 
     # Imprimimos las lineas para generar el DATASET
-    if configFile_value.get('GENERATE_DATASET') == 'enable':
+    if configFile_value.get('GENERATE_DATASET') == 'yes':
         print_mac_line()
+
 
 
 """Generamos las lineas del dataset con formato. Ordenamos de mas actividad a menor actividad."""
@@ -423,7 +445,7 @@ def print_mac_line():
         print(';'.join(map(str,value)))
 
 
-"""Comprobamos si se ha detectado una MAC que no se encuentra censada en tm-month.json"""
+"""Comprobamos si se ha detectado una MAC nueva en la red, esto es, que no se encuentra censada en tm-month.json"""
 def check_macs():
     MACS_nuevas = list()
     dir = './tm-month.json'
@@ -433,14 +455,10 @@ def check_macs():
         datos_json = load_json(dir)
         for mac_captura in macs_captura:
             if mac_captura not in datos_json:
-                #print(f"ALERTA! Se ha detectado nueva MAC en la red ({mac_captura})")
                 f = open("new_macs_detected.log", "a")
                 f.write(f"{dia} {hora} - {mac_captura}\n")
                 f.close()
 
-"""Para obtener las primeras n MACs de mas actividad de la captura"""
-def take(n, iterable):
-    return dict(islice(iterable, n))
 
 """Guarda la captura en el directorio forensic"""
 def save_cap(macs_atacando):
@@ -460,55 +478,36 @@ def save_cap(macs_atacando):
         os.system(c)
 
 
-"""Funcion que invoca al Random/Isolation Forest para realizar la prediccion si una MAC ha cometido un ataque.
-   Se analizan las primeras 5 MACs que tienen una mayor actividad.
-   Tambien se envian valores a Nagios para su representacion Grafica en Dashboards > Banana
-   Si el algoritmo detecta un ataque; envia un correo electronico al dept. de redes y guarda la captura en directorio /forensic"""
+""" Prediccion de la actividad de las direcciones MAC del dataset """
 def run_IA():
     if os.path.isfile('./predict_iso_forest.py') and os.path.isfile('./model_iso_forest.bin'):
         macs_atacando = []
-        order_dict= dict()
-        n_macs_analize = 0
 
+        # Agrupacion de los datos
+        to_dataFrame = list()
         for key, value in sorted(mac_line.items(), key=lambda item: item[1][0], reverse=True):
-            order_dict[key]=value
+            aux = list()
+            aux.append(key)
+            aux.extend(value)
+            to_dataFrame.append(aux)
 
-        # Obtenemos las n macs con mas actividad
-        if configFile_value.get('NUM_MACS_TO_ANALIZE') == 'auto':
-            n_macs_analize = int(len(mac_line)* 20/100)
-        elif configFile_value.get('NUM_MACS_TO_ANALIZE') == 'none':
-            n_macs_analize = int(len(mac_line))
-        else:
-            n_macs_analize = int(configFile_value.get('NUM_MACS_TO_ANALIZE'))
+        # ISOLATION FOREST. Se obtiene las direcciones MAC anomalas:
+        macs_atacando = predict_capture(to_dataFrame)
+        #print(macs_atacando)
 
-        n_items = take(n_macs_analize, order_dict.items())
-
-        # Creamos la cadena de entrada para el script de prediccion(c): mac;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;LIPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP
-        for key, value in n_items.items():
-            a = key + ";"
-            b =';'.join(map(str,value))
-            c = a+b
-
-            result_predict = os.system("./predict_iso_forest.py -s" + '"' + c + '"' + "> output_predict.tmp") #ISOLATION FOREST
-
-            si_output = read_txt("output_predict.tmp")
-            s_output = si_output[1:-2]
-
-            # El algoritmo Isolation Forest tiene como salida -1 en caso de que haya un ataque
-            if s_output == str(-1):
-                macs_atacando.append(key)
-
-        # Si hay ataque, mostramos las MACs que se encuentran atacando y realizamos una llamada a Nagios.
+        # Si el algoritmo detecta alguna MAC que ha cometido alguna anomalia
         if macs_atacando:
-            #Guardamos captura de la MAC atacante
+
+            # Se guarda la captura en un PCAP en forensic/numero_MAC
             save_cap(macs_atacando)
 
-            if configFile_value.get('SEND_EMAIL') == 'enable':
-                # Eviamos correo electronico
+            # Se envia correo electronico
+            if configFile_value.get('SEND_EMAIL') == 'yes':
                 send_email_attack(macs_atacando)
             else:
-                print("No se envia correo")
+                print(f"MACS atacando {', '.join(map(str,macs_atacando))}. No se envia correo.")
 
+            # Se registra en un fichero de log
             for mac_atacando in macs_atacando:
                 #print(f"MAC {mac_atacando} atacando!")
                 #print(f"ALERTA! Se ha detectado nueva MAC en la red ({mac_captura})")
@@ -516,14 +515,11 @@ def run_IA():
                 f.write(f"{dia} {hora} - {mac_atacando}\n")
                 f.close()
 
+
 """Envio de un correo electronico debido a que se ha detectado que una MAC ha producido un ataque."""
 def send_email_attack(macs_atacando):
     global dia, hora
     receivers_email = configFile_value.get('RECEIVERS_EMAIL').split(",")
-
-    # Nombre de la Banana:
-    #nre_banana = ''.join(getValuesConfig('BANANA'))
-    nre_banana = configFile_value.get('BANANA')
 
     # Inicializamos el texto a mostrar por correo
     mac_interfaz_switch = ""
@@ -548,9 +544,9 @@ def send_email_attack(macs_atacando):
     registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP\n"
     for mac_atacando in macs_atacando:
         if len(macs_atacando) == 1:
-            body = f"La banana de {nre_banana} ha detectado que la MAC {str(mac_atacando)} ha tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis y se aplica accion DROP en el Switch correspondiente. \n\nDETALLES:"
+            body = f"BCAST_IDS ha detectado que la MAC {str(mac_atacando)} ha tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
         else:
-            body = f"La banana de {nre_banana} ha detectado que las MAC {', '.join(map(str,macs_atacando))} han tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis y se aplica accion DROP en los Switches correspondientes. \n\nDETALLES:"
+            body = f"BCAST_IDS ha detectado que las MAC {', '.join(map(str,macs_atacando))} han tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
         registro_mac += mac_atacando + ";"
         registro_mac += ';'.join(map(str,mac_line[mac_atacando])) +"\n"
         if mac_atacando in ipm_subred:
@@ -575,6 +571,7 @@ def send_email_attack(macs_atacando):
 
     # Enviamos el mensaje con el fichero pcap adjunto
     send_email(subject,body,nre_banana,receivers_email,True)
+
 
 """Envio de correos electronicos con el Asunto y Cuerpo del mensaje deseado"""
 def send_email(*args):
@@ -607,7 +604,6 @@ def send_email(*args):
             f"attachment; filename= {filename}",
         )
 
-
     ## Log in to server using secure context and send email
     try:
         for receiver_email in receivers_email:
@@ -627,7 +623,7 @@ def send_email(*args):
                 server.sendmail(sender_email, receiver_email, text)
                 print("Se ha enviado el correo")
     except:
-        print("El correo no se ha enviado")
+        print("ERROR! No se ha podido enviar el correo electronico. Comprueba el servidor de correo, puerto o las direcciones de correo de remitente y destinatario")
 
 
 if __name__ == '__main__':
