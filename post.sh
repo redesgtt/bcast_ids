@@ -1,6 +1,8 @@
 #!/bin/bash
 . ./config.txt
 
-echo "-Z root -w ./round_time%S.cap -G $POST -z ./bcast_AI_v15.py >> $FILENAME.csv"
+MAC=`/sbin/ifconfig $IFACE2 | grep ether | awk '{print $2}'`
 
-tcpdump -ni $IFACE2  -Z root -w ./round_time%S.cap -G $POST -z ./bcast_ids_lite_v2.py >> $FILENAME.csv
+echo "tcpdump -ni $IFACE2  -Z root -w ./round_time%S.cap -G $POST -z ./bcast_ids_lite_v2.py not ether host $MAC >> $FILENAME.csv"
+
+tcpdump -ni $IFACE2  -Z root -w ./round_time%S.cap -G $POST -z ./bcast_ids_lite_v2.py "not ether host $MAC" >> $FILENAME.csv
