@@ -102,7 +102,6 @@ The meaning of each property is detailed below:
 | `BANANA`  | PC name.  |
 | `NET`  | Network range.  |
 | `EXCLUDE_MACS`  | MAC addresses to exclude (i.e. the default gateway). If there are two or more, they should separate by ',' i.e. MAC1,MAC2 |
-| `NUM_MACS_TO_ANALIZE`  | Number of MACs to predict their activities. Three possible values: **number**, **'auto'** (it takes the first 20% top activity MACs) and **'none'** (the Machine Learning algorithm analyze all MACs seen in each network capture). |
 | `UPDATE_TIME_JSON_HOUR`  | Time to update tip.json, tm.json, externos.json, ti6.json, ipf.json. |
 | `UPDATE_TIME_JSON_12HOURS`  | Time to update ipm.json. |
 | `UPDATE_TIME_JSON_WEEK`  | Time to update tips-week.json. |
