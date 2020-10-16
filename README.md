@@ -39,6 +39,8 @@ The training dataset can be collected from a real-world connected environment. A
 | IPv6  | Total IPv6 traffic generated from a specific MAC address  |
 | ETH_RESTO  | Total ETHERNET traffic generated from a specific MAC address  |
 | ARP_noIP  | Total ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
+| SSDP  | Total SSDP traffic generated from a specific MAC address   |
+| ICMPv6  | Total ICMPv6s traffic generated from a specific MAC address   |
 
 Once the features were determined to fed the Isolation Forest algorithm, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
 
@@ -53,15 +55,14 @@ BCAST_IDS requires **`Python 3` branch**
 Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian calendar**:
 ```
 # POST.SH
-## Allow to generate a dataset (enable/disable)
+## Allow to generate a dataset (yes/no)
 GENERATE_DATASET=enable
 FILENAME='dataset'
 POST=10
 IFACE2=eth1
 
 # BCAST_IDS_LITE
-BANANA=MiPC
-NET=192.168.0
+NET=192.168.1
 EXCLUDE_MACS=""
 NUM_MACS_TO_ANALIZE=5
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json
@@ -73,7 +74,7 @@ UPDATE_TIME_JSON_WEEK=604800
 ## Update time tm-month.json
 UPDATE_TIME_JSON_MONTH=2592000
 
-## Allow sending emails from BCAST_IDS (enable/disable) 
+## Allow sending emails from BCAST_IDS (yes/no) 
 SEND_EMAIL=disable
 MAIL_SERVER=
 PORT_MAIL_SERVER=25
