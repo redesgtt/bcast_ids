@@ -54,16 +54,22 @@ BCAST_IDS requires **`Python 3` branch**
 ### Configuration files
 Edit the `config.txt` and fill up the variables on your own. **Time is represented in gregorian calendar**:
 ```
+#####################################################################################
+#
+#                         BCAST_IDS CONFIGURATION FILE
+#
+#####################################################################################
+
 # POST.SH
 ## Allow to generate a dataset (yes/no)
-GENERATE_DATASET=enable
-FILENAME='dataset'
+GENERATE_DATASET=yes
+FILENAME=dataset
 POST=10
-IFACE2=eth1
+IFACE2=eth0
 
 # BCAST_IDS_LITE
-NET=192.168.1
-EXCLUDE_MACS=""
+NET=192.168
+EXCLUDE_MACS=50f7224a44d4,dca63241a6dc,b0faebef31a1
 NUM_MACS_TO_ANALIZE=5
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json
 UPDATE_TIME_JSON_HOUR=1800
@@ -73,11 +79,15 @@ UPDATE_TIME_JSON_12HOURS=43200
 UPDATE_TIME_JSON_WEEK=604800
 ## Update time tm-month.json
 UPDATE_TIME_JSON_MONTH=2592000
+## Enable auto-training (yes/no)
+AUTOMATED_TRAINING=yes
+## Time to automate training (20 min)
+TIME_AUTOMATED_TRAINING=1800
 
-## Allow sending emails from BCAST_IDS (yes/no) 
-SEND_EMAIL=disable
+## Allow sending emails from BCAST_IDS (yes/no)
+SEND_EMAIL=no
 MAIL_SERVER=
-PORT_MAIL_SERVER=25
+PORT_MAIL_SERVER=
 SENDER_EMAIL=
 RECEIVERS_EMAIL=
 ```
@@ -97,6 +107,8 @@ The meaning of each property is detailed below:
 | `UPDATE_TIME_JSON_12HOURS`  | Time to update ipm.json. |
 | `UPDATE_TIME_JSON_WEEK`  | Time to update tips-week.json. |
 | `UPDATE_TIME_JSON_MONTH`  | Time to update tm-month.json. |
+| `AUTOMATED_TRAINING`  | In order to train the algorithm automatically |
+| `TIME_AUTOMATED_TRAINING`  | Time interval to train the algorithm with the current dataset. It takes the last 12.000 entries of the dataset |
 | `SEND_EMAIL`  | Enable or disable to send emails. |
 | `MAIL_SERVER`  | Mail server name. |
 | `PORT_MAIL_SERVER`  | Port mail server. |
