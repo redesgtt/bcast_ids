@@ -78,7 +78,7 @@ def predict_if(cad, filename):
         except:
             print("No se ha podido realizar la prediccion")
     else:
-        print("No se ha podido carga el modelo")
+        print("No se ha podido cargar el modelo")
 
 def predict_dataset_if(dataset, filename):
     if filename == None:
@@ -88,7 +88,8 @@ def predict_dataset_if(dataset, filename):
 
     if loaded_model != None:
         try:
-            dataFrame=pd.read_csv(dataset,sep=';')
+            name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+            dataFrame=pd.read_csv(dataset,sep=';',names=name_columns)
             dataFrame= dataFrame.fillna(0)
             to_model_columns=dataFrame.columns[1:19]
             dataFrame[to_model_columns] = dataFrame[to_model_columns].astype(int)

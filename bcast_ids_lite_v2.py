@@ -31,6 +31,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 from predict_iso_forest import predict_capture
+from train_iso_forest import train_capture
 
 """Guarda JSON"""
 def save_json(obj, name):
@@ -42,14 +43,14 @@ def load_json(name):
     with open(name, 'r') as f:
         return(json.load(f))
 
-"""Guarda resultado del algoritmo de IA en un fichero de txt"""
-def save_txt(name, salida_output):
-    f = open(name, "w")
+"""Guardamos cadena en un fichero de log"""
+def save_text(name, salida_output, option):
+    f = open(name, option)
     f.write(salida_output)
     f.close()
 
-"""Lee el resultado del algoritmo de IA del fichero txt"""
-def read_txt(name):
+"""Leemos cadena de un fichero de log"""
+def read_text(name):
     f = open(name)
     return f.read()
 
@@ -71,7 +72,6 @@ def ip_addr (c) :
     #d = "%d.%d.%d.%d" % (ord(c[0]) , ord(c[1]) , ord(c[2]), ord(c[3])) # Python < 3
     d = "%d.%d.%d.%d" % (c[0],c[1],c[2],c[3])
     return d
-
 
 """ Devuelve un diccionario con todos los valores del fichero config.txt """
 def getValuesConfig():
@@ -445,7 +445,7 @@ def print_mac_line():
         print(';'.join(map(str,value)))
 
 
-"""Comprobamos si se ha detectado una MAC nueva en la red, esto es, que no se encuentra censada en tm-month.json"""
+"""Registramos la primera vez que se ha visualizado una direccion MAC y que no se encuentre censada en el fichero JSON"""
 def check_macs():
     MACS_nuevas = list()
     dir = './tm-month.json'
@@ -455,9 +455,10 @@ def check_macs():
         datos_json = load_json(dir)
         for mac_captura in macs_captura:
             if mac_captura not in datos_json:
-                f = open("new_macs_detected.log", "a")
-                f.write(f"{dia} {hora} - {mac_captura}\n")
-                f.close()
+                #f = open("new_macs_detected.log", "a")
+                #f.write(f"{dia} {hora} - {mac_captura}\n")
+                #f.close()
+                save_text("new_macs_detected.log", f"{dia} {hora} - {mac_captura}\n", "a")
 
 
 """Guarda la captura en el directorio forensic"""
@@ -480,6 +481,7 @@ def save_cap(macs_atacando):
 
 """ Prediccion de la actividad de las direcciones MAC del dataset """
 def run_IA():
+    # Si se encuentra un modelo entrenado, realice la prediccion
     if os.path.isfile('./predict_iso_forest.py') and os.path.isfile('./model_iso_forest.bin'):
         macs_atacando = []
 
@@ -491,7 +493,7 @@ def run_IA():
             aux.extend(value)
             to_dataFrame.append(aux)
 
-        # ISOLATION FOREST. Se obtiene las direcciones MAC anomalas:
+        # ISOLATION FOREST. Obtiene las direcciones MAC anomalas:
         macs_atacando = predict_capture(to_dataFrame)
         #print(macs_atacando)
 
@@ -504,16 +506,31 @@ def run_IA():
             # Se envia correo electronico
             if configFile_value.get('SEND_EMAIL') == 'yes':
                 send_email_attack(macs_atacando)
-            else:
-                print(f"MACS atacando {', '.join(map(str,macs_atacando))}. No se envia correo.")
 
             # Se registra en un fichero de log
             for mac_atacando in macs_atacando:
-                #print(f"MAC {mac_atacando} atacando!")
-                #print(f"ALERTA! Se ha detectado nueva MAC en la red ({mac_captura})")
-                f = open("macs_abnormal_act.log", "a")
-                f.write(f"{dia} {hora} - {mac_atacando}\n")
-                f.close()
+                save_text("macs_abnormal_act.log", f"{dia} {hora} - {mac_atacando}\n", "a")
+    else:
+        if configFile_value.get('AUTOMATED_TRAINING')=='yes':
+            if os.path.isfile('./time.tmp'):
+                seconds_file = read_text('./time.tmp')
+                if seconds - int(seconds_file) >= int(configFile_value.get('TIME_AUTOMATED_TRAINING')):
+                    print(f"Han pasado mas de {seconds - int(seconds_file)} segundos. Entrenamos el algoritmo con los datos recogidos hasta ahora")
+
+                    # Actualizamos el fichero time.tmp
+                    save_text('./time.tmp', str(seconds), "w")
+                    name_dataset = configFile_value.get('FILENAME')
+
+                    # Entrenamos el modelo con contamination 'auto' en caso contrario especificar como segundo parametro
+                    print("Comenzamos entrenamiento...")
+                    train_capture(f"./{name_dataset}.csv")
+                    print("Finalizamos el entrenamiento y se guarda en un modelo")
+
+                    print(results_training)
+                    #save_text('./results_training.tmp', str(results_training), "w")
+            else:
+                save_text('./time.tmp', str(seconds), "w")
+                print(f"Guardamos el fichero de time.tmp con el valor de {seconds}")
 
 
 """Envio de un correo electronico debido a que se ha detectado que una MAC ha producido un ataque."""
@@ -570,18 +587,18 @@ def send_email_attack(macs_atacando):
     body += txt_IPF
 
     # Enviamos el mensaje con el fichero pcap adjunto
-    send_email(subject,body,nre_banana,receivers_email,True)
+    send_email(subject,body,receivers_email,True,macs_atacando)
 
 
 """Envio de correos electronicos con el Asunto y Cuerpo del mensaje deseado"""
 def send_email(*args):
     subject = args[0]
     body = args[1]
-    nre_banana = args[2]
-    attachment_pcap = args[4]
+    attachment_pcap = args[3]
+    macs_atacando = args[4]
 
     sender_email = configFile_value.get('SENDER_EMAIL')
-    receivers_email = args[3]
+    receivers_email = args[2]
 
     mail_server = configFile_value.get('MAIL_SERVER')
     port_mail_server = int(configFile_value.get('PORT_MAIL_SERVER'))
@@ -621,13 +638,18 @@ def send_email(*args):
             text = message.as_string()
             with smtplib.SMTP(mail_server, port_mail_server) as server:
                 server.sendmail(sender_email, receiver_email, text)
-                print("Se ha enviado el correo")
+                # Registramos en un fichero de log si se ha enviado el mensaje
+                save_text("email_messages.log", f"{dia} {hora} CORREO ELECTRONICO ENVIADO A {', '.join(map(str,receivers_email))} - MACs con act anomalas: {', '.join(map(str,macs_atacando))} \n", "a")
+
     except:
-        print("ERROR! No se ha podido enviar el correo electronico. Comprueba el servidor de correo, puerto o las direcciones de correo de remitente y destinatario")
+        # Registramos en un fichero de log si NO se ha eniado el mensaje por correo electronico
+        save_text("email_messages.log", f"{dia} {hora} ERROR EN EL ENVIO DEL CORREO ELECTRONICO (revisa los valores de MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL y RECEIVERS_EMAIL del fichero config.txt) - MACs con act anomalas: {', '.join(map(str,macs_atacando))} \n", "a")
+        #f = open("email_messages.log", "a")
+        #f.write(f"{dia} {hora} ERROR EN EL ENVIO DEL CORREO ELECTRONICO (revisa los valores de MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL y RECEIVERS_EMAIL del fichero config.txt)  - MACs con act anomalas: {', '.join(map(str,macs_atacando))}\n")
+        #f.close()
 
 
 if __name__ == '__main__':
-
     # Generamos los diccionarios de tm, tip, externos, ti6 e ipm
     f = open(sys.argv[1],'rb')
     pcap = dpkt.pcap.Reader(f)
