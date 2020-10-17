@@ -387,7 +387,6 @@ def count_packets(*args):
 Formato: {mac : 'MACs, UCAST, MCAST, BCAST, ARPrq, ARPpb, ARPan, ARPgr, LIPF, IP_ICMP, IP_UDP, IP_TCP, IP_RESTO, IP6, RESTO, ARP_noIP, SSDP, ICMPv6'} """
 def mac_lines(pcap):
     excluye_macs = configFile_value.get('EXCLUDE_MACS').split(",")
-    mac_ataque_dataset = "000ffec58a53"
     num_attributes = 18
     attributes = [0] * num_attributes # Inicializamos la lista de valores de cada MAC a 0
     #print(attributes)
@@ -519,18 +518,26 @@ def run_IA():
 
                     # Actualizamos el fichero time.tmp
                     save_text('./time.tmp', str(seconds), "w")
+
+                    # Pasamos por parametro al algoritmo el nombre de fichero de texto y la contamination
                     name_dataset = configFile_value.get('FILENAME')
+                    contamination = configFile_value.get('CONTAMINATION')
 
                     # Entrenamos el modelo con contamination 'auto' en caso contrario especificar como segundo parametro
                     print("Comenzamos entrenamiento...")
-                    train_capture(f"./{name_dataset}.csv")
-                    print("Finalizamos el entrenamiento y se guarda en un modelo")
+                    if train_capture(f"./{name_dataset}.csv",contamination):
+                        # TODO: Escribir mensaje en un fichero de log
+                        print("Finalizamos el entrenamiento y se guarda en un modelo")
+                        # TODO: Guardar las MACs que el algoritmo ha detectado como anomalas
+                    else:
+                        # TODO: Escribir mensaje en un fichero de log
+                        print("FALLO EN EL ENTRENAMIENTO")
 
-                    print(results_training)
+                    #print(results_training)
                     #save_text('./results_training.tmp', str(results_training), "w")
             else:
                 save_text('./time.tmp', str(seconds), "w")
-                print(f"Guardamos el fichero de time.tmp con el valor de {seconds}")
+                #print(f"Guardamos el fichero de time.tmp con el valor de {seconds}")
 
 
 """Envio de un correo electronico debido a que se ha detectado que una MAC ha producido un ataque."""

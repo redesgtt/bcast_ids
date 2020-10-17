@@ -42,25 +42,31 @@ def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
     print(df['ANOMALY'].value_counts())
 
 """ Funcion principal de entrenamiento del algoritmo Isolation Forest """
-def train_capture(dataset, c='auto', filename='model_iso_forest.bin'):
+def train_capture(dataset, c, filename='model_iso_forest.bin'):
     name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+    train_successful = True
 
-    # Leemos el fichero y agregamos columnas
-    df = pd.read_csv(dataset,sep=';',names=name_columns)
-    df = df.fillna(0)
-    to_model_columns=df.columns[1:19]
-    df[to_model_columns] = df[to_model_columns].astype(int)
+    try:
+        # Leemos el fichero y agregamos columnas
+        df = pd.read_csv(dataset,sep=';',names=name_columns)
+        df = df.fillna(0)
+        to_model_columns=df.columns[1:19]
+        df[to_model_columns] = df[to_model_columns].astype(int)
 
-    # Iniciamos el entrenamiento del algoritmo
-    if c == 'auto':
-        classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
-    else:
-        classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
-    classifier.fit(df[to_model_columns])
+        # Iniciamos el entrenamiento del algoritmo
+        if c == 'auto':
+            classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
+        else:
+            classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
 
-    # Guardamos el modelo en formato .bin
-    pickle.dump(classifier, open(filename, 'wb'))
+        classifier.fit(df[to_model_columns])
 
+        # Guardamos el modelo en formato .bin
+        pickle.dump(classifier, open(filename, 'wb'))
+    except:
+        train_successful = False
+    finally:
+        return train_successful
 
 if __name__ == '__main__':
     text_help= "Script para entrenar el algoritmo Isolation Forest sobre un conjunto de datos de entrada. Ejemplos:"

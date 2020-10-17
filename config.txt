@@ -9,28 +9,29 @@
 GENERATE_DATASET=yes
 FILENAME=dataset
 POST=10
-IFACE2=eth0
+IFACE2=eth1
 
 # BCAST_IDS_LITE
-NET=192.168
-EXCLUDE_MACS=50f7224a44d4,dca63241a6dc,b0faebef31a1
-NUM_MACS_TO_ANALIZE=5
-## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json
+NET=192.168.1
+EXCLUDE_MACS=
+## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json (in seconds)
 UPDATE_TIME_JSON_HOUR=1800
-## Update time ipm.json
+## Update time ipm.json (in seconds)
 UPDATE_TIME_JSON_12HOURS=43200
-## Update time tips-week.json
+## Update time tips-week.json (in seconds)
 UPDATE_TIME_JSON_WEEK=604800
-## Update time tm-month.json
+## Update time tm-month.json (in seconds)
 UPDATE_TIME_JSON_MONTH=2592000
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
-## Time to automate training (20 min)
+## Time to automate training (in seconds)
 TIME_AUTOMATED_TRAINING=45
+## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5)
+CONTAMINATION=auto
 
 ## Allow sending emails from BCAST_IDS (yes/no) 
 SEND_EMAIL=no
-MAIL_SERVER=correos.gtt.es
+MAIL_SERVER=
 PORT_MAIL_SERVER=25
-SENDER_EMAIL=banana_wifi@gtt.es
-RECEIVERS_EMAIL=jgombao_log@gtt.es
+SENDER_EMAIL=
+RECEIVERS_EMAIL=
