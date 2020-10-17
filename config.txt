@@ -25,9 +25,9 @@ UPDATE_TIME_JSON_MONTH=2592000
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
-TIME_AUTOMATED_TRAINING=45
+TIME_AUTOMATED_TRAINING=900
 ## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5)
-CONTAMINATION=auto
+CONTAMINATION=0.1
 
 ## Allow sending emails from BCAST_IDS (yes/no) 
 SEND_EMAIL=no

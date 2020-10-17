@@ -90,7 +90,6 @@ def getValuesConfig():
 # Diccionario que almacena los valores del fichero config:
 configFile_value = getValuesConfig()
 
-
 #...................................................................................
 
 # CONSTANTES
@@ -98,7 +97,6 @@ AGING1 = int(configFile_value.get('UPDATE_TIME_JSON_HOUR'))
 AGING2 = int(configFile_value.get('UPDATE_TIME_JSON_12HOURS'))
 AGING3 = int(configFile_value.get('UPDATE_TIME_JSON_WEEK'))
 AGING4 = int(configFile_value.get('UPDATE_TIME_JSON_MONTH'))
-
 seconds = int(time.time())
 dia = datetime.today().strftime('%d/%m/%Y')
 hora = datetime.today().strftime('%H:%M')
@@ -131,7 +129,6 @@ ts = 0
 def generate_file(dir, datos_captura, ag):
     new_items = dict()
     global seconds
-    # print(datos_captura)
     aux = []
     exists = os.path.isfile(dir)
     if exists:
@@ -142,10 +139,8 @@ def generate_file(dir, datos_captura, ag):
         if datos_json:
             for i in datos_json:
                 res = seconds - datos_json[i]
-                #print(datos_json[i])
 
                 if res > ag:
-                    #print(res)
                     aux.append(i)
 
             # Si la lista no esta vacia, significa que hay elementos para borrar
@@ -161,13 +156,10 @@ def generate_file(dir, datos_captura, ag):
             if key_captura in datos_json:
                 # Actualizacion de tiempos si direccion MAC se encuentra activa y se ha visto en menos de 4 horas
                 if seconds - value_captura < ag:
-                    #print("Coincide: " + key_captura +", ", end=".")
-                    #print("Cambio de valor: " + str(value_captura))
                     datos_json[key_captura] = value_captura
 
             #Si una IP/MAC se ve activa y no existe, se crea de nuevo con la estampilla horaria actual
             else:
-                # print("Entramos aqui. No se ha detectado flag")
                 # Comprobamos que los datos son menores que cuatro horas.
                 if dir == './ipf.json':
                     if check_s(str(key_captura)) not in datos_json:
@@ -177,7 +169,6 @@ def generate_file(dir, datos_captura, ag):
                     if seconds - value_captura < ag:
                         new_items[str(key_captura)]=value_captura
 
-        # print (new_items)
         # Si se han detectado IPs/MACs nuevas y activas:
         if new_items:
             # Datos JSON + NUEVOS DATOS
@@ -203,11 +194,9 @@ def generate_file(dir, datos_captura, ag):
                 save_json(dict(), dir)
 
 
-
 """Evita duplicidades en el IPF. Ej: 192.168.3.2_192.168.3.57 = 192.168.3.57_192.168.3.2"""
 def check_s(s):
     return(s.split('_')[1] + "_" + s.split('_')[0])
-
 
 
 """Funcion requerida para generar los valores de las tablas caches tip, ti6, ipm, externos y tip-week"""
@@ -370,8 +359,6 @@ def count_packets(*args):
 
     # IPv6
     elif eth_type == '86dd':
-        #print("Trafico IPv6 detectado", mac_src)
-
         # Contabilizamos paquetes IPv6
         attributes[13]+=1
 
@@ -454,9 +441,6 @@ def check_macs():
         datos_json = load_json(dir)
         for mac_captura in macs_captura:
             if mac_captura not in datos_json:
-                #f = open("new_macs_detected.log", "a")
-                #f.write(f"{dia} {hora} - {mac_captura}\n")
-                #f.close()
                 save_text("new_macs_detected.log", f"{dia} {hora} - {mac_captura}\n", "a")
 
 
@@ -494,7 +478,6 @@ def run_IA():
 
         # ISOLATION FOREST. Obtiene las direcciones MAC anomalas:
         macs_atacando = predict_capture(to_dataFrame)
-        #print(macs_atacando)
 
         # Si el algoritmo detecta alguna MAC que ha cometido alguna anomalia
         if macs_atacando:
@@ -514,8 +497,6 @@ def run_IA():
             if os.path.isfile('./time.tmp'):
                 seconds_file = read_text('./time.tmp')
                 if seconds - int(seconds_file) >= int(configFile_value.get('TIME_AUTOMATED_TRAINING')):
-                    print(f"Han pasado mas de {seconds - int(seconds_file)} segundos. Entrenamos el algoritmo con los datos recogidos hasta ahora")
-
                     # Actualizamos el fichero time.tmp
                     save_text('./time.tmp', str(seconds), "w")
 
@@ -524,20 +505,14 @@ def run_IA():
                     contamination = configFile_value.get('CONTAMINATION')
 
                     # Entrenamos el modelo con contamination 'auto' en caso contrario especificar como segundo parametro
-                    print("Comenzamos entrenamiento...")
                     if train_capture(f"./{name_dataset}.csv",contamination):
-                        # TODO: Escribir mensaje en un fichero de log
-                        print("Finalizamos el entrenamiento y se guarda en un modelo")
-                        # TODO: Guardar las MACs que el algoritmo ha detectado como anomalas
+                        # TODO: Escribir resultados del entrenamiento y ver calcular valor contamination automaticamente
+                        save_text("messages_training.log", f"{dia} {hora} - ENTRENAMIENTO REALIZADO CORRECTAMENTE. MODELO model_iso_forest.bin creado en el directorio actual \n", "a")
                     else:
                         # TODO: Escribir mensaje en un fichero de log
-                        print("FALLO EN EL ENTRENAMIENTO")
-
-                    #print(results_training)
-                    #save_text('./results_training.tmp', str(results_training), "w")
+                        save_text("messages_training.log", f"{dia} {hora} - ENTRENAMIENTO NO REALIZADO CORRECTAMENTE. El MODELO no se ha creado. \n", "a")
             else:
                 save_text('./time.tmp', str(seconds), "w")
-                #print(f"Guardamos el fichero de time.tmp con el valor de {seconds}")
 
 
 """Envio de un correo electronico debido a que se ha detectado que una MAC ha producido un ataque."""
@@ -651,9 +626,6 @@ def send_email(*args):
     except:
         # Registramos en un fichero de log si NO se ha eniado el mensaje por correo electronico
         save_text("email_messages.log", f"{dia} {hora} ERROR EN EL ENVIO DEL CORREO ELECTRONICO (revisa los valores de MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL y RECEIVERS_EMAIL del fichero config.txt) - MACs con act anomalas: {', '.join(map(str,macs_atacando))} \n", "a")
-        #f = open("email_messages.log", "a")
-        #f.write(f"{dia} {hora} ERROR EN EL ENVIO DEL CORREO ELECTRONICO (revisa los valores de MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL y RECEIVERS_EMAIL del fichero config.txt)  - MACs con act anomalas: {', '.join(map(str,macs_atacando))}\n")
-        #f.close()
 
 
 if __name__ == '__main__':

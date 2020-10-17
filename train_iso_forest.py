@@ -9,41 +9,52 @@ from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import train_test_split
 
-""" Funcion principal de entrenamiento del algoritmo Isolation Forest """
+name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+
+""" Para entrenar al algoritmo de Isolation Forest de manera manual """
 def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
+    global name_columns
     print("Inicio del entrenamiento...")
 
-    name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+    try:
+        # Leemos el fichero csv y preparamos los datos para el entrenamiento:
+        try:
+            df = pd.read_csv(dataset,sep=';',names=name_columns)
+            df = df.fillna(0)
+            to_model_columns=df.columns[1:19]
+            df[to_model_columns] = df[to_model_columns].astype(int)
+            if c == 'auto':
+                classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
+            else:
+                classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
+                # Entrenamiento y prediccion de los resultados
+            pred = classifier.fit_predict(df[to_model_columns])
 
-    # Leemos el fichero:
-    df = pd.read_csv(dataset,sep=';',names=name_columns)
-    df = df.fillna(0)
-    to_model_columns=df.columns[1:19]
-    df[to_model_columns] = df[to_model_columns].astype(int)
-    if c == 'auto':
-        classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
-    else:
-        classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
+            # Imprimimos las anomalias detectadas en pantalla
+            outliers=df.loc[pred==-1]
+            print("\t\nANOMALIAS:")
+            print(outliers)
 
-    classifier.fit(df[to_model_columns])
+            # Imprimimos recuento de anomalias total:
+            print("\t\nRECUENTO: (1 actividad normal / -1 anomalias)")
+            df['ANOMALY']=pred
+            print(df['ANOMALY'].value_counts())
 
-    pickle.dump(classifier, open(filename, 'wb'))
-    print(f'\nMODELO {filename} guardado en directorio actual')
+            # Guardamos modelo
+            try:
+                pickle.dump(classifier, open(filename, 'wb'))
+                print(f'\nMODELO {filename} guardado en directorio actual')
+            except:
+                print("ERROR! No se ha podido guardar el modelo")
+        except:
+            print("ERROR! Fallo en la lectura del dataset. ¿Has comprobado que exista en el mismo directorio y/o tenga el formato adecuado?")
+    except:
+        print("No se ha podido realizar correctamente entrenamiento")
 
-    # Predecimos las actividades de la MAC del algoritmo ya entrenado
-    pred = classifier.predict(df[to_model_columns])
-    df['ANOMALY']=pred
-    outliers=df.loc[df['ANOMALY']==-1]
 
-    print("\t\nANOMALIAS:")
-    print(outliers)
-
-    print("\t\nRECUENTO:")
-    print(df['ANOMALY'].value_counts())
-
-""" Funcion principal de entrenamiento del algoritmo Isolation Forest """
+""" Para entrenar al algoritmo Isolation Forest desde el programa principal automaticamente """
 def train_capture(dataset, c, filename='model_iso_forest.bin'):
-    name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+    global name_columns
     train_successful = True
 
     try:
@@ -84,11 +95,14 @@ if __name__ == '__main__':
         file = vars(ap.parse_args())["dataset"]
         contamination = vars(ap.parse_args())["contamination"]
         if contamination != None:
-            if float(contamination) > float(0.5) or float(contamination) < 0:
-                print("\t\nERROR! El parametro CONTAMINATION tiene que estar en el rango [0, 0.5]\n")
-            else:
-                print(f'\nENTRENAMOS MODELO CON CONTAMINATION {contamination} \n')
-                train_dataset(file, float(contamination))
+            try:
+                if float(contamination) > float(0.5) or float(contamination) < 0:
+                    print("\t\nERROR! El parametro CONTAMINATION tiene que estar en el rango [0, 0.5]\n")
+                else:
+                    print(f'\nENTRENAMOS MODELO CON CONTAMINATION {contamination} \n')
+                    train_dataset(file, float(contamination))
+            except:
+                print("ERROR! Introduce un numero de contamination valido. Recuerda que tiene que estar en el rango [0, 0.5] o 'auto'")
         else:
             contamination = 'auto'
             print(f'\nENTRENAMOS MODELO CON CONTAMINATION {contamination}. \n')

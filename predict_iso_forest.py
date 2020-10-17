@@ -9,6 +9,8 @@ from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
 import warnings
 
+name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+
 def load_model(filename):
     try:
         # Cargar el modelo desde el disco
@@ -19,12 +21,11 @@ def load_model(filename):
 
 """ Prediccion de la actividad de un conjunto de direcciones MAC. Devuelve una lista de las MACs anomalas de la captura en curso"""
 def predict_capture(dataset):
+    global name_columns
     loaded_model = load_model("./model_iso_forest.bin")
     macs_atacando = list()
     if loaded_model != None:
         try:
-            name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
-
             # Leemos los datos de la captura
             dataFrame = pd.DataFrame(dataset,columns=name_columns)
 
@@ -47,19 +48,21 @@ def predict_capture(dataset):
             return macs_atacando
 
     else:
-        print("ERROR! No se ha podido cargar el modelo")
+        #print("ERROR! No se ha podido cargar el modelo")
         return macs_atacando
 
 
 def predict_if(cad, filename):
+
+    # Cabecera:
+    headers = "MAC;NUM_MACS;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6"
+
     if filename == None:
         loaded_model = load_model("./model_iso_forest.bin")
     else:
         loaded_model = load_model(filename)
 
     if loaded_model != None:
-        # Cabecera:
-        headers = "MAC;NUM_MACS;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6"
         # Convertimos los datos a un DataFrame para poder predecir el resultado:
         d = dict()
         for i in range(len(headers.split(";"))):
@@ -70,7 +73,6 @@ def predict_if(cad, filename):
         df = pd.DataFrame(data=d)
 
         traff_dif = df.iloc[ : ,1:19]
-        #traff_dif = df.drop(['IP_TCP','ARPpb','ARPan','MAC','IP_UDP','IP6','UCAST','MCAST'], axis=1)
         try:
             # Resultado de la prediccion:
             prediction = loaded_model.predict(traff_dif)
@@ -81,6 +83,7 @@ def predict_if(cad, filename):
         print("No se ha podido cargar el modelo")
 
 def predict_dataset_if(dataset, filename):
+    global name_columns
     if filename == None:
         loaded_model = load_model("./model_iso_forest.bin")
     else:
@@ -88,7 +91,6 @@ def predict_dataset_if(dataset, filename):
 
     if loaded_model != None:
         try:
-            name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
             dataFrame=pd.read_csv(dataset,sep=';',names=name_columns)
             dataFrame= dataFrame.fillna(0)
             to_model_columns=dataFrame.columns[1:19]
@@ -107,9 +109,10 @@ def predict_dataset_if(dataset, filename):
             print(f"Cantidad de MACs con actividad Anormal: {count_anomaly}")
             print("------------------------------------")
 
-            dataFrame['IF']=prediction
-            outliers=dataFrame.loc[dataFrame['IF']==-1]
-            print(outliers.to_string())
+            # Imprimimos las anomalias detectadas en pantalla
+            outliers=dataFrame.loc[prediction==-1]
+            print("\t\nANOMALIAS:")
+            print(outliers)
 
         except FileNotFoundError:
             msg = "Vaya... Parece que no se encuentra el fichero {0}.".format(dataset)
