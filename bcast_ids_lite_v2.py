@@ -468,7 +468,7 @@ def run_IA():
     if os.path.isfile('./predict_iso_forest.py') and os.path.isfile('./model_iso_forest.bin'):
         macs_atacando = []
 
-        # Agrupacion de los datos
+        # Agrupacion y preparacion de los datos
         to_dataFrame = list()
         for key, value in sorted(mac_line.items(), key=lambda item: item[1][0], reverse=True):
             aux = list()
@@ -489,9 +489,10 @@ def run_IA():
             if configFile_value.get('SEND_EMAIL') == 'yes':
                 send_email_attack(macs_atacando)
 
-            # Se registra en un fichero de log
-            for mac_atacando in macs_atacando:
-                save_text("macs_abnormal_act.log", f"{dia} {hora} - {mac_atacando}\n", "a")
+            # Se registra en un fichero de log las MACs que han cometido alguna anomalia
+            if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+                for mac_atacando in macs_atacando:
+                    save_text("macs_abnormal_act.log", f"{dia} {hora} - {mac_atacando}\n", "a")
     else:
         if configFile_value.get('AUTOMATED_TRAINING')=='yes':
             if os.path.isfile('./time.tmp'):
@@ -504,13 +505,16 @@ def run_IA():
                     name_dataset = configFile_value.get('FILENAME')
                     contamination = configFile_value.get('CONTAMINATION')
 
-                    # Entrenamos el modelo con contamination 'auto' en caso contrario especificar como segundo parametro
-                    if train_capture(f"./{name_dataset}.csv",contamination):
-                        # TODO: Escribir resultados del entrenamiento y ver calcular valor contamination automaticamente
-                        save_text("messages_training.log", f"{dia} {hora} - ENTRENAMIENTO REALIZADO CORRECTAMENTE. MODELO model_iso_forest.bin creado en el directorio actual \n", "a")
-                    else:
-                        # TODO: Escribir mensaje en un fichero de log
-                        save_text("messages_training.log", f"{dia} {hora} - ENTRENAMIENTO NO REALIZADO CORRECTAMENTE. El MODELO no se ha creado. \n", "a")
+                    # Result_Train. Devuelve si se ha podido realizar el entrenamiento correctamente y el valor de contaminacion
+                    result_train = train_capture(f"./{name_dataset}.csv",contamination)
+
+                    if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+                        save_text("messages_training.log", result_train, "a")
+                        #if result_train[0]:
+                        #    save_text("messages_training.log",f"{dia} {hora} - Automated training was successful with contamination {result_train[1]}. Model (model_iso_forest.bin) created at {os.getcwd()} \n","a")
+                        #else:
+                        #    save_text("messages_training.log", f"{dia} {hora} - ERROR! Automated training was not successful. Model was NOT created. \n", "a")
+
             else:
                 save_text('./time.tmp', str(seconds), "w")
 
@@ -530,32 +534,35 @@ def send_email_attack(macs_atacando):
 
     # Cabecera del mensaje
     if len(macs_atacando) == 1:
-        subject = "ALERTA! MAC con actividad inusual"
+        subject = "ALERT! MAC with unusual activity"
     else:
-        subject = "ALERTA! MACs con actividad inusual"
+        subject = "ALERTA! MACs with unusual activity"
 
     #DETALLES de la MAC anomala en el cuerpo del mensaje:
     ## Direccion IP de la MAC
-    ## Ubicacion fisica de la MAC
     ## Actividad de la MAC
     ## Direcciones IP que ha preguntado y NO existen (valores de ARP_nIP)
     ## Direcciones IP que una MAC ha preguntado y SI existen (valores de IPF)
     registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP\n"
     for mac_atacando in macs_atacando:
         if len(macs_atacando) == 1:
-            body = f"BCAST_IDS ha detectado que la MAC {str(mac_atacando)} ha tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
+            #body = f"BCAST_IDS ha detectado que la MAC {str(mac_atacando)} ha tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
+            body = f"BCAST_IDS has detected that MAC {str(mac_atacando)} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
         else:
-            body = f"BCAST_IDS ha detectado que las MAC {', '.join(map(str,macs_atacando))} han tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
+            #body = f"BCAST_IDS ha detectado que las MAC {', '.join(map(str,macs_atacando))} han tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
+            body = f"BCAST_IDS has detected that MACs {', '.join(map(str,macs_atacando))} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
         registro_mac += mac_atacando + ";"
         registro_mac += ';'.join(map(str,mac_line[mac_atacando])) +"\n"
         if mac_atacando in ipm_subred:
-            txt_dir_IP_MAC = "\nDireccion IP:"
+            txt_dir_IP_MAC = "\nIP address:"
             dir_IP_MAC += f"\n{mac_atacando} -> {ipm_subred[mac_atacando]}"
         if mac_atacando in mac_nip:
-            txt_ARP_nIP += f"\nARP_noIP. Direcciones IP que ha preguntado la MAC {mac_atacando} y NO existen (peticiones ARP): \n"
+            #txt_ARP_nIP += f"\nARP_noIP. Direcciones IP que ha preguntado la MAC {mac_atacando} y NO existen (peticiones ARP): \n"
+            txt_ARP_nIP += f"\nARP_noIP. IP addresses that MAC {mac_atacando} asked and DO NOT exist (ARP request): \n"
             txt_ARP_nIP += '; '.join(map(str,mac_nip[mac_atacando])) +"\n"
         if mac_atacando in mac_ipf:
-            txt_IPF += f"\nIPF. Direcciones IP que ha preguntado la MAC {mac_atacando} y SI existen (peticiones ARP): \n"
+            #txt_IPF += f"\nIPF. Direcciones IP que ha preguntado la MAC {mac_atacando} y SI existen (peticiones ARP): \n"
+            txt_IPF += f"\nIPF. IP addresses that MAC {mac_atacando} asked and EXIST (ARP request): \n"
             txt_IPF += '; '.join(map(str,mac_ipf[mac_atacando])) +"\n"
 
     # Completamos el cuerpo del mensaje
@@ -563,7 +570,7 @@ def send_email_attack(macs_atacando):
     body += dir_IP_MAC
     body += "\n" + ubicacion_fisica
     body += mac_interfaz_switch
-    body += "\n\nActividad registrada: \n"
+    body += "\n\nActivity: \n"
     body += registro_mac
     body += txt_ARP_nIP
     body += txt_IPF
@@ -621,56 +628,64 @@ def send_email(*args):
             with smtplib.SMTP(mail_server, port_mail_server) as server:
                 server.sendmail(sender_email, receiver_email, text)
                 # Registramos en un fichero de log si se ha enviado el mensaje
-                save_text("email_messages.log", f"{dia} {hora} CORREO ELECTRONICO ENVIADO A {', '.join(map(str,receivers_email))} - MACs con act anomalas: {', '.join(map(str,macs_atacando))} \n", "a")
+                if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+                    save_text("email_messages.log", f"{dia} {hora} e-Mail sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n", "a")
 
     except:
-        # Registramos en un fichero de log si NO se ha eniado el mensaje por correo electronico
-        save_text("email_messages.log", f"{dia} {hora} ERROR EN EL ENVIO DEL CORREO ELECTRONICO (revisa los valores de MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL y RECEIVERS_EMAIL del fichero config.txt) - MACs con act anomalas: {', '.join(map(str,macs_atacando))} \n", "a")
-
+        # Registramos en un fichero de log si NO se ha enviado el mensaje por correo electronico
+        if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+            save_text("email_messages.log", f"{dia} {hora} ERROR! e-Mail was not sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n\t\t NOTES: Check values of MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL and RECEIVERS_EMAIL (config.txt). Verify if you have privileges to send mails with that mail server. \n", "a")
 
 if __name__ == '__main__':
-    # Generamos los diccionarios de tm, tip, externos, ti6 e ipm
-    f = open(sys.argv[1],'rb')
-    pcap = dpkt.pcap.Reader(f)
-    active_caches(pcap)
-    f.close()
-
-    # Generamos los ficheros JSON necesarios
-    if tip:
-        generate_file('./tips-week.json', tip, AGING3)
-        generate_file('./tip.json', tip, AGING1)
-    if tm:
-        generate_file('./tm.json', tm, AGING1)
-    if externos:
-        generate_file('./externos.json', externos, AGING1)
-    if ti6:
-        generate_file('./ti6.json', ti6, AGING1)
-    if ipm:
-        generate_file('./ipm.json', ipm, AGING2)
-
-    if os.path.isfile('./tips-week.json'):
-        # Generamos diccionario de ipf
+    try:
+        # Generamos los diccionarios de tm, tip, externos, ti6 e ipm
         f = open(sys.argv[1],'rb')
         pcap = dpkt.pcap.Reader(f)
-        ipf_nipf(pcap)
+        active_caches(pcap)
         f.close()
 
-    # Generamos fichero de asociacion de IPF:
-    if ipf:
-        generate_file('./ipf.json', ipf, AGING1)
+        # Generamos los ficheros JSON necesarios
+        if tip:
+            generate_file('./tips-week.json', tip, AGING3)
+            generate_file('./tip.json', tip, AGING1)
+        if tm:
+            generate_file('./tm.json', tm, AGING1)
+        if externos:
+            generate_file('./externos.json', externos, AGING1)
+        if ti6:
+            generate_file('./ti6.json', ti6, AGING1)
+        if ipm:
+            generate_file('./ipm.json', ipm, AGING2)
 
-    # Contabiliza el numero de paquetes de la captura por MAC:
-    fa = open(sys.argv[1],'rb')
-    pcapa = dpkt.pcap.Reader(fa)
-    mac_lines(pcapa)
-    fa.close()
+        if os.path.isfile('./tips-week.json'):
+            # Generamos diccionario de ipf
+            f = open(sys.argv[1],'rb')
+            pcap = dpkt.pcap.Reader(f)
+            ipf_nipf(pcap)
+            f.close()
 
-    # Comprueba si se ha detectado una direccion MAC que no esta en el JSON
-    check_macs()
+        # Generamos fichero de asociacion de IPF:
+        if ipf:
+            generate_file('./ipf.json', ipf, AGING1)
 
-    # Generamos fichero de MACs censadas en 1 mes
-    if tm:
-        generate_file('./tm-month.json', tm, AGING4)
+        # Contabiliza el numero de paquetes de la captura por MAC:
+        fa = open(sys.argv[1],'rb')
+        pcapa = dpkt.pcap.Reader(fa)
+        mac_lines(pcapa)
+        fa.close()
 
-    # Aplicamos algoritmo IA
-    run_IA()
+        # Comprueba si se ha detectado una direccion MAC que no esta en el tm-month y lo almacena en un fichero de LOG
+        if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+            check_macs()
+
+        # Generamos fichero de MACs censadas en 1 mes
+        if tm:
+            generate_file('./tm-month.json', tm, AGING4)
+
+        # Aplicamos algoritmo IA
+        run_IA()
+
+    except FileNotFoundError:
+        print(f"ERROR! File {sys.argv[1]} not found. Insert an existing network capture (.cap) as a first argument.")
+    except IndexError:
+        print("ERROR! Insert a valid network capture as a first argument. Example: ./bcast_ids_lite_v2.py [name_network_capture].cap")

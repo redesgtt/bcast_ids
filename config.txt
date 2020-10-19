@@ -9,10 +9,10 @@
 GENERATE_DATASET=yes
 FILENAME=dataset
 POST=10
-IFACE2=eth1
+IFACE2=eth0
 
 # BCAST_IDS_LITE
-NET=192.168.1
+NET=192.168.0
 EXCLUDE_MACS=
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json (in seconds)
 UPDATE_TIME_JSON_HOUR=1800
@@ -22,16 +22,18 @@ UPDATE_TIME_JSON_12HOURS=43200
 UPDATE_TIME_JSON_WEEK=604800
 ## Update time tm-month.json (in seconds)
 UPDATE_TIME_JSON_MONTH=2592000
+# Enable to generate log files (email_messages.log, macs_abnormal_act.log, messages_training.log, new_macs_detected.log)
+GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
-TIME_AUTOMATED_TRAINING=900
+TIME_AUTOMATED_TRAINING=600
 ## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5)
-CONTAMINATION=0.1
+CONTAMINATION=auto
 
 ## Allow sending emails from BCAST_IDS (yes/no) 
 SEND_EMAIL=no
 MAIL_SERVER=
-PORT_MAIL_SERVER=25
+PORT_MAIL_SERVER=
 SENDER_EMAIL=
 RECEIVERS_EMAIL=
