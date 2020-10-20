@@ -19,6 +19,7 @@ The following picture represents an overview of the BCAST_IDS architecture:
 
 The system will also generate the following files:
 - ***JSON files:***
+
 | JSON  | Description |
 | ------------- | ------------- |
 | **tip.json**  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file |
@@ -31,6 +32,7 @@ The system will also generate the following files:
 | **tm-month.json**  | {MAC source:time}. Active source MACs which have a month expiration by default |
 
 - ***LOG files***
+
 | JSON  | Description |
 | ------------- | ------------- |
 | **macs_abnormal_act.log**  | It indicates the MACs that the algorithm has detected as abnormal |
@@ -39,6 +41,7 @@ The system will also generate the following files:
 | **email_messages.log**  | It indicates if the email was sent correctly or not |
 
 - ***PCAP files (./bcast_ids/forensic/)***
+
 | JSON  | Description |
 | ------------- | ------------- |
 | **{MAC}/{date}.cap**  | It contains the suspicious traffic that the algorithm has identified of a MAC or a set of MACs in the network capture|
