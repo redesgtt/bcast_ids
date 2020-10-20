@@ -37,14 +37,14 @@ The system will also generate the following files:
 | ------------- | ------------- |
 | **macs_abnormal_act.log**  | It indicates the MACs that the algorithm has detected as abnormal |
 | **messages_training.log**  | It indicates if the automated training of the algorithm was okay or not  |
-| **new_macs_detected.log**  | MACs detected for the first time and which are not found in the tm-month.json file previously  |
+| **new_macs_detected.log**  | MACs detected for the first time and which are not found in the tm-month.json file before  |
 | **email_messages.log**  | It indicates if the email was sent correctly or not |
 
-- **PCAP files (./bcast_ids/forensic/)**
+- **PCAP files**
 
 | File name  | Description |
 | ------------- | ------------- |
-| **{MAC}/{date}.cap**  | It contains the suspicious traffic that the algorithm has identified of a MAC or a set of MACs in the network capture|
+| **./bcast_ids/forensic/{MAC}/{date}.cap**  | It contains the suspicious traffic that the algorithm has identified of a MAC or a set of MACs in the network capture|
 
 #### Trainning
 ##### Automated training
