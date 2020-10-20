@@ -87,10 +87,20 @@ def train_capture(dataset, c, filename='model_iso_forest.bin'):
                     classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
             else:
                 classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
-            classifier.fit(df[to_model_columns])
+
+            # Train and predict the anomalies detected in the dataset
+            pred = classifier.fit_predict(df[to_model_columns])
+
             # We save the model in .bin format
             pickle.dump(classifier, open(filename, 'wb'))
-            message = f"{dia} {hora} - Automated training was successful with contamination {c}. Model (model_iso_forest.bin) created at {os.getcwd()} \n"
+
+            # Show the results:
+            message = (f"{dia} {hora} - Automated training was successful with contamination {c}. ML model created at {os.getcwd()}/{filename}\n"
+            f"\t\t   RESULTS: {len(df.loc[pred==-1].axes[0])} anomalies detected in the first {len(df.axes[0])} rows of the {dataset} at the time of automated training.\n"
+            f"The anomalies detected were: \n {df.loc[pred==-1].to_string()} \n"
+            )
+
+            #message = f"{dia} {hora} - Automated training was successful with contamination {c}. Model (model_iso_forest.bin) created at {os.getcwd()} \n"
         else:
             message = f"{dia} {hora} - ERROR! Dataset is empty. Automated training was not successful. Model was NOT created. \n"
             train_successful = False
