@@ -15,7 +15,7 @@ There are three main phases to make this project comes true:
 
 The following picture represents an overview of the BCAST_IDS architecture:
 
-![alt text](https://user-images.githubusercontent.com/69505347/96605126-1fd15780-12f6-11eb-9974-74d2f592233b.png)
+![alt text](https://user-images.githubusercontent.com/69505347/96608639-e6025000-12f9-11eb-9089-6d20bb856c5e.png)
 
 The system will also generate the following files:
 - **JSON files:**
