@@ -15,7 +15,7 @@ There are three main phases to make this project comes true:
 
 The following picture represents an overview of the BCAST_IDS architecture:
 
-![alt text](https://user-images.githubusercontent.com/69505347/91721307-d89dd480-eb98-11ea-9655-6ba4da95e401.png)
+![alt text](https://user-images.githubusercontent.com/69505347/96605126-1fd15780-12f6-11eb-9974-74d2f592233b.png)
 
 ### Dataset Generation and Preprocessing
 The training dataset is collected from a real-world connected environment. At this point, the main features have to be identified. There are a whole bunch of features that can be monitored by networking tools for network analysis over the network, but some of them could be redundant. So, we have selected nineteen features and are listed below:
