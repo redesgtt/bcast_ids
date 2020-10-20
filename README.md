@@ -165,5 +165,5 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 
 #### Detection
 1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate, the BCAST_IDS should detected anomalies un your network! If the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover if the system detects a new MAC in the network which was not in tm-month.json, it will be registered at `new_macs_detected.log`. 
-2. Moreover, a network capture will be saved if the algorithm detects any abnormal activity.
+2. Moreover, a network capture will be saved if the algorithm detects any abnormal activity at the ./bcast_ids/forensic directory.
 3. Finally, if you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and complete the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent well or there was a problem.
