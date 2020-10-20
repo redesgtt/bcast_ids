@@ -18,9 +18,9 @@ The following picture represents an overview of the BCAST_IDS architecture:
 ![alt text](https://user-images.githubusercontent.com/69505347/96605126-1fd15780-12f6-11eb-9974-74d2f592233b.png)
 
 The system will also generate the following files:
-- ***JSON files:***
+- **JSON files:**
 
-| JSON  | Description |
+| File name  | Description |
 | ------------- | ------------- |
 | **tip.json**  | {IP source subnet:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file |
 | **tm.json**  | {MAC source:time}. Active source MACs  |
@@ -31,18 +31,18 @@ The system will also generate the following files:
 | **tips-week.json**  | {IP source:time}. Active source IPs (v.4) which belong to the network range specified in the `NET` attribute of the config file. It has a week expiration by default |
 | **tm-month.json**  | {MAC source:time}. Active source MACs which have a month expiration by default |
 
-- ***LOG files***
+- **LOG files**
 
-| JSON  | Description |
+| File name  | Description |
 | ------------- | ------------- |
 | **macs_abnormal_act.log**  | It indicates the MACs that the algorithm has detected as abnormal |
 | **messages_training.log**  | It indicates if the automated training of the algorithm was okay or not  |
 | **new_macs_detected.log**  | MACs detected for the first time and which are not found in the tm-month.json file previously  |
 | **email_messages.log**  | It indicates if the email was sent correctly or not |
 
-- ***PCAP files (./bcast_ids/forensic/)***
+- **PCAP files (./bcast_ids/forensic/)**
 
-| JSON  | Description |
+| File name  | Description |
 | ------------- | ------------- |
 | **{MAC}/{date}.cap**  | It contains the suspicious traffic that the algorithm has identified of a MAC or a set of MACs in the network capture|
 
