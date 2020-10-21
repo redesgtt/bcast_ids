@@ -12,10 +12,10 @@ POST=10
 IFACE2=eth0
 
 # BCAST_IDS_LITE
-NET=192.168.0
+NET=192.168
 EXCLUDE_MACS=
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json (in seconds)
-UPDATE_TIME_JSON_HOUR=1800
+UPDATE_TIME_JSON_HOUR=3600
 ## Update time ipm.json (in seconds)
 UPDATE_TIME_JSON_12HOURS=43200
 ## Update time tips-week.json (in seconds)
@@ -27,7 +27,7 @@ GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
-TIME_AUTOMATED_TRAINING=600
+TIME_AUTOMATED_TRAINING=3600
 ## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5)
 CONTAMINATION=auto
 
