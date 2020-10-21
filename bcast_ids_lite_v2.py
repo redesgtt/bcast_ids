@@ -489,10 +489,10 @@ def run_IA():
             if configFile_value.get('SEND_EMAIL') == 'yes':
                 send_email_attack(macs_atacando)
 
-            # Se registra en un fichero de log las MACs que han cometido alguna anomalia
+            # Se registra en un fichero de log las MACs que han cometido alguna anomalia y su actividad
             if configFile_value.get('GENERATE_LOG_FILES')=='yes':
                 for mac_atacando in macs_atacando:
-                    save_text("macs_abnormal_act.log", f"{dia} {hora} - {mac_atacando}\n", "a")
+                    save_text("macs_abnormal_act.log", f"{dia} {hora} - MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
     else:
         if configFile_value.get('AUTOMATED_TRAINING')=='yes':
             if os.path.isfile('./time.tmp'):
@@ -510,11 +510,6 @@ def run_IA():
 
                     if configFile_value.get('GENERATE_LOG_FILES')=='yes':
                         save_text("messages_training.log", result_train, "a")
-                        #if result_train[0]:
-                        #    save_text("messages_training.log",f"{dia} {hora} - Automated training was successful with contamination {result_train[1]}. Model (model_iso_forest.bin) created at {os.getcwd()} \n","a")
-                        #else:
-                        #    save_text("messages_training.log", f"{dia} {hora} - ERROR! Automated training was not successful. Model was NOT created. \n", "a")
-
             else:
                 save_text('./time.tmp', str(seconds), "w")
 
@@ -546,10 +541,8 @@ def send_email_attack(macs_atacando):
     registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP\n"
     for mac_atacando in macs_atacando:
         if len(macs_atacando) == 1:
-            #body = f"BCAST_IDS ha detectado que la MAC {str(mac_atacando)} ha tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
             body = f"BCAST_IDS has detected that MAC {str(mac_atacando)} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
         else:
-            #body = f"BCAST_IDS ha detectado que las MAC {', '.join(map(str,macs_atacando))} han tenido un comportamiento sospechoso el dia {dia} a las {hora}. Se anexa captura de red para su analisis. \n\nDETALLES:"
             body = f"BCAST_IDS has detected that MACs {', '.join(map(str,macs_atacando))} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
         registro_mac += mac_atacando + ";"
         registro_mac += ';'.join(map(str,mac_line[mac_atacando])) +"\n"
@@ -557,11 +550,9 @@ def send_email_attack(macs_atacando):
             txt_dir_IP_MAC = "\nIP address:"
             dir_IP_MAC += f"\n{mac_atacando} -> {ipm_subred[mac_atacando]}"
         if mac_atacando in mac_nip:
-            #txt_ARP_nIP += f"\nARP_noIP. Direcciones IP que ha preguntado la MAC {mac_atacando} y NO existen (peticiones ARP): \n"
             txt_ARP_nIP += f"\nARP_noIP. IP addresses that MAC {mac_atacando} asked and DO NOT exist (ARP request): \n"
             txt_ARP_nIP += '; '.join(map(str,mac_nip[mac_atacando])) +"\n"
         if mac_atacando in mac_ipf:
-            #txt_IPF += f"\nIPF. Direcciones IP que ha preguntado la MAC {mac_atacando} y SI existen (peticiones ARP): \n"
             txt_IPF += f"\nIPF. IP addresses that MAC {mac_atacando} asked and EXIST (ARP request): \n"
             txt_IPF += '; '.join(map(str,mac_ipf[mac_atacando])) +"\n"
 
@@ -577,7 +568,6 @@ def send_email_attack(macs_atacando):
 
     # Enviamos el mensaje con el fichero pcap adjunto
     send_email(subject,body,receivers_email,True,macs_atacando)
-
 
 """Envio de correos electronicos con el Asunto y Cuerpo del mensaje deseado"""
 def send_email(*args):
@@ -682,7 +672,7 @@ if __name__ == '__main__':
         if tm:
             generate_file('./tm-month.json', tm, AGING4)
 
-        # Aplicamos algoritmo IA
+        # Aplicamos algoritmo IA para generar una decision
         run_IA()
 
     except FileNotFoundError:
