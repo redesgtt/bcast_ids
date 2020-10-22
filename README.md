@@ -190,3 +190,9 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network! If the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover if the system detects a new MAC in the network which was not in `tm-month.json`, it will be registered at `new_macs_detected.log`. 
 2. Furthermore, a network capture will be saved if the algorithm detects any abnormal activity at the `./bcast_ids/forensic` directory.
 3. Finally, if you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and complete the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or there was a problem.
+
+## References
+1. Buczak AL, Guven E (2016) A survey of data mining and machine learning methods for cyber security intrusion detection. IEEE Commun Surv Tutor 18(2):1153–1176. https://doi.org/10.1109/COMST.2015.2494502
+2. Sommer R, Paxson V (2010) Outside the closed world: on using machine learning for network intrusion detection. In: Proceedings of the 2010 IEEE Symposium on Security and Privacy. IEEE Computer Society, Los Alamitos, CA, USA, pp 305–316. https://doi.org/10.1109/SP.2010.25
+3. Russell SJ, Norvig P (2009) Artificial intelligence: amodern approach, 3rd edn. Pearson, Essex
+4. Farnaaz N, Jabbar M (2016) Random forest modeling for network intrusion detection system. Procedia Comput Sci 89:213–217. https://doi.org/10.1016/j.procs.2016.06.047
