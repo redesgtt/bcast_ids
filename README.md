@@ -45,14 +45,10 @@ The system will also generate the following files:
 | File name  | Description |
 | ------------- | ------------- |
 | **./bcast_ids/forensic/{MAC}/{date}.cap**  | It contains the suspicious traffic that the algorithm has identified of a MAC or a set of MACs in the network capture|
+| **round{num}.cap**  | Save the packet data in a cycled files obtained by tcpdump, which prints the headers of packets on a network interface that match the boolean expression|
 
-#### Trainning
-##### Automated training
-1. If there is no a Machine Learning model in the bcast_ids directory, the system can extract data patterns automatically from the data collected at `dataset.csv` so far, taking into account the countdown specified in `TIME_AUTOMATED_TRAINING`. Also, make sure `AUTOMATED_TRAINING` is set to 'yes'. Remember you can adjust the contamination parameter of the Isolation Forest algorithm in the config file (it is set to 'auto' by default).
-2. Once the countdown is over and if everything went as expected, a model will be created in the bcast_ids folder with the name 'model_iso_forest.bin' and the results could be checked at the file `training_messages.log`. Otherwise, an message error will appear at the aforementioned log file.
-3. You can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
-### Dataset Generation and Preprocessing
+### Dataset Generation
 The training dataset is collected from a real-world connected environment. At this point, the main features have to be identified. There are a whole bunch of features that can be monitored by networking tools for network analysis over the network, but some of them could be redundant. So, we have selected nineteen features and are listed below:
 
 | Feature  | Description |
@@ -176,6 +172,12 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 3. It is time to make some kind of **cyberattacks to your own network**. If you are in a Wifi network, try to download any **network scanning tool in order to make outliers in the data**. For that, you can use your smartphone or tablet. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). If want to use a distinct PC computer to perform cyberattacks, you can employ `nmap, arp-scan, netdiscover...` Make sure that the devices your perform the cyberattacks and BCAST_IDS are connected in the same network.
 4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the dataset has 10.000-12.000 lines.
 6. At the same time, you can also see the .json files. Remember that, their time expiration can be modified in config.txt file through `UPDATE_TIME_JSON_HOUR`, `UPDATE_TIME_JSON_12HOURS`, `UPDATE_TIME_JSON_WEEK` and `UPDATE_TIME_JSON_MONTH` properties.
+
+#### Trainning
+##### Automated training
+1. If there is no a Machine Learning model in the bcast_ids directory, the system can extract data patterns automatically from the data collected at `dataset.csv` so far, taking into account the countdown specified in `TIME_AUTOMATED_TRAINING`. Also, make sure `AUTOMATED_TRAINING` is set to 'yes'. Remember you can adjust the contamination parameter of the Isolation Forest algorithm in the config file (it is set to 'auto' by default).
+2. Once the countdown is over and if everything went as expected, a model will be created in the bcast_ids folder with the name 'model_iso_forest.bin' and the results could be checked at the file `training_messages.log`. Otherwise, an message error will appear at the aforementioned log file.
+3. You can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 ##### Manual training
 1. You can use the script `./train_iso_forest.py` manually to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm.
