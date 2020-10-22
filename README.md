@@ -18,7 +18,7 @@ The following picture represents an overview of the BCAST_IDS architecture:
 ![alt text](https://user-images.githubusercontent.com/69505347/96608639-e6025000-12f9-11eb-9089-6d20bb856c5e.png)
 
 The system will also generate the following files:
-- **JSON files:**
+- **JSON files: (time is represented as a integer number expressed in seconds since the epoch, in UTC)**
 
 | File name  | Description |
 | ------------- | ------------- |
@@ -73,7 +73,7 @@ The training dataset is collected from a real-world connected environment. At th
 | SSDP  | Total SSDP traffic generated from a specific MAC address   |
 | ICMPv6  | Total ICMPv6s traffic generated from a specific MAC address   |
 
-Once the features were determined to fed the Isolation Forest algorithm, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
+Once the features were determined to fed the Isolation Forest algorithm later, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset will cover distinct attack types and attack-free circumstances. 
 
 ## Running the BCAST_IDS
 ### Hardware Prerequisites
@@ -88,6 +88,7 @@ dpkt psutil numpy pandas sklearn
 ### Configuration files
 You can modify the `config.txt` file and fill up the variables on your own. **Time is always represented in seconds**:
 ```
+  
 #####################################################################################
 #
 #                         BCAST_IDS CONFIGURATION FILE
@@ -102,7 +103,7 @@ POST=10
 IFACE2=eth0
 
 # BCAST_IDS_LITE
-NET=192.168.1
+NET=192.168
 EXCLUDE_MACS=
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json (in seconds)
 UPDATE_TIME_JSON_HOUR=3600
@@ -116,8 +117,8 @@ UPDATE_TIME_JSON_MONTH=2592000
 GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
-## Time to automate training (in seconds) - 1 hour by default
-TIME_AUTOMATED_TRAINING=1800
+## Time to automate training (in seconds)
+TIME_AUTOMATED_TRAINING=3600
 ## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5)
 CONTAMINATION=auto
 
@@ -187,5 +188,5 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 
 #### Detection
 1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network! If the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover if the system detects a new MAC in the network which was not in `tm-month.json`, it will be registered at `new_macs_detected.log`. 
-2. Moreover, a network capture will be saved if the algorithm detects any abnormal activity at the `./bcast_ids/forensic` directory.
-3. Finally, if you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and complete the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent well or there was a problem.
+2. Furthermore, a network capture will be saved if the algorithm detects any abnormal activity at the `./bcast_ids/forensic` directory.
+3. Finally, if you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and complete the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or there was a problem.
