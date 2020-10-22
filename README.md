@@ -200,5 +200,7 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 ## References
 1. Buczak AL, Guven E (2016) A survey of data mining and machine learning methods for cyber security intrusion detection. IEEE Commun Surv Tutor 18(2):1153–1176. https://doi.org/10.1109/COMST.2015.2494502
 2. Sommer R, Paxson V (2010) Outside the closed world: on using machine learning for network intrusion detection. In: Proceedings of the 2010 IEEE Symposium on Security and Privacy. IEEE Computer Society, Los Alamitos, CA, USA, pp 305–316. https://doi.org/10.1109/SP.2010.25
-3. Russell SJ, Norvig P (2009) Artificial intelligence: amodern approach, 3rd edn. Pearson, Essex
+3. Russell SJ, Norvig P (2009) Artificial intelligence: a modern approach, 3rd edn. Pearson, Essex
 4. Farnaaz N, Jabbar M (2016) Random forest modeling for network intrusion detection system. Procedia Comput Sci 89:213–217. https://doi.org/10.1016/j.procs.2016.06.047
+5. Garfinkel S (2002) Network forensics: tapping the Internet. https://paulohm.com/classes/cc06/files/Week6%20Network%20Forensics.pdf 
+6. Moradi M, Zulkernine M (2004) A neural network based system for intrusion detection and classification of attacks. http://research.cs.queensu.ca/~moradi/148-04-MM-MZ.pdf
