@@ -505,8 +505,11 @@ def run_IA():
                     name_dataset = configFile_value.get('FILENAME')
                     contamination = configFile_value.get('CONTAMINATION')
 
-                    # Result_Train. Devuelve si se ha podido realizar el entrenamiento correctamente y el valor de contaminacion
-                    result_train = train_capture(f"./{name_dataset}.csv",contamination)
+                    # Devuelve una cadena de si se ha podido realizar el entrenamiento correctamente
+                    if configFile_value.get('GENERATE_OUTLIERS') == 'yes':
+                        result_train = train_capture(f"./{name_dataset}.csv",contamination)
+                    else:
+                        result_train = train_capture(f"./{name_dataset}.csv",contamination, False)
 
                     if configFile_value.get('GENERATE_LOG_FILES')=='yes':
                         save_text("messages_training.log", result_train, "a")
