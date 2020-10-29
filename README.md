@@ -94,7 +94,6 @@ dpkt psutil numpy pandas sklearn
 ### Configuration files
 You can modify the `config.txt` file and fill up the variables on your own. **Time is always represented in seconds**:
 ```
-  
 #####################################################################################
 #
 #                         BCAST_IDS CONFIGURATION FILE
@@ -106,11 +105,11 @@ You can modify the `config.txt` file and fill up the variables on your own. **Ti
 GENERATE_DATASET=yes
 FILENAME=dataset
 POST=10
-IFACE2=eth0
+IFACE2=ens2
 
 # BCAST_IDS_LITE
-NET=192.168
-EXCLUDE_MACS=
+NET=9.56
+EXCLUDE_MACS=50f7224a44f7,1062e5a3b634
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json (in seconds)
 UPDATE_TIME_JSON_HOUR=3600
 ## Update time ipm.json (in seconds)
@@ -124,11 +123,13 @@ GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
-TIME_AUTOMATED_TRAINING=3600
-## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5)
+TIME_AUTOMATED_TRAINING=20
+## Enable to generate automated outliers in data.
+GENERATE_OUTLIERS=yes
+## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5). If GENERATE_OUTLIERS='yes' and CONTAMINATION='auto' the contamination is set to 0.01 by default.
 CONTAMINATION=auto
 
-## Allow sending emails from BCAST_IDS (yes/no) 
+## Allow sending emails from BCAST_IDS (yes/no)
 SEND_EMAIL=no
 MAIL_SERVER=
 PORT_MAIL_SERVER=
