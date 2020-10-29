@@ -105,11 +105,11 @@ You can modify the `config.txt` file and fill up the variables on your own. **Ti
 GENERATE_DATASET=yes
 FILENAME=dataset
 POST=10
-IFACE2=ens2
+IFACE2=eth0
 
 # BCAST_IDS_LITE
-NET=9.56
-EXCLUDE_MACS=50f7224a44f7,1062e5a3b634
+NET=192.168
+EXCLUDE_MACS=
 ## Update time tip.json, tm.json, externos.json, ti6.json, ipf.json (in seconds)
 UPDATE_TIME_JSON_HOUR=3600
 ## Update time ipm.json (in seconds)
@@ -123,10 +123,10 @@ GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
-TIME_AUTOMATED_TRAINING=20
-## Enable to generate automated outliers in data.
+TIME_AUTOMATED_TRAINING=7200
+## Enable to generate outliers
 GENERATE_OUTLIERS=yes
-## Adjust Isolation Forest algorithm parameter (auto, float number: 0 < CONTAMINATION < 0.5). If GENERATE_OUTLIERS='yes' and CONTAMINATION='auto' the contamination is set to 0.01 by default.
+## Percentaje of the outliers in the data (auto, float number: 0 < CONTAMINATION < 0.5)
 CONTAMINATION=auto
 
 ## Allow sending emails from BCAST_IDS (yes/no)
@@ -153,6 +153,7 @@ The meaning of each property is detailed below:
 | `GENERATE_LOG_FILES`  | Enable to generate log files (email_messages.log, macs_abnormal_act.log, messages_training.log, new_macs_detected.log) |
 | `AUTOMATED_TRAINING`  | In order to train the algorithm automatically (yes/no) |
 | `TIME_AUTOMATED_TRAINING`  | Countdown to train the algorithm with the current dataset. It takes the last 12.000 entries of the dataset |
+| `GENERATE_OUTLIERS`  | Enable to generate outliers automatically |
 | `CONTAMINATION`  | It specifies the percentage of observations we believe to be outliers. It can be two different values: 'auto' or a float number.  If it is set to 'auto', contamination is equal to the number of ARP_noIP columns largest than 40 (its value is large in network scanning attacks) divided by total rows in the dataset at the time of automated trainning. If it is a number, the parameter must be between 0.0 and 0.5 |
 | `SEND_EMAIL`  | Enable or disable to send emails |
 | `MAIL_SERVER`  | Mail server name |
@@ -176,8 +177,9 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 
 #### Preprocessing
 1. Firstly, **make sure you are as a 'root' user** and you fill up correctly the variables of config.txt file (`IFACE2`, `NET`, `EXCLUDE_MACS`...). Execute `./post.sh` in order to generate training data. Remember that in this phase the variable `GENERATE_DATASET` should set to 'yes'. Keep this script running. If you want to run it at the background you can type `./post.sh &` at the command prompt. Network traffic is analized each 10 seconds by default (`POST` variable).
-2. The dataset is now generating and is growing over time. Type `tail -f dataset.csv` at the command prompt to observe it. 
-3. It is time to make some kind of **cyberattacks to your own network**. If you are in a Wifi network, try to download any **network scanning tool in order to make outliers in the data**. For that, you can use your smartphone or tablet. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). If want to use a distinct PC computer to perform cyberattacks, you can employ `nmap, arp-scan, netdiscover...` or any network scanning tool you know. Make sure that the devices your perform the cyberattacks and BCAST_IDS are connected in the same network.
+2. The dataset is now generating and is growing over time. Type `tail -f dataset.csv` at the command prompt to observe it.
+3. If you have set the varible `GENERATE_OUTLIERS` to yes the program will make outliers for you, that is typical cyberattack data patterns.
+3. If the variable `GENERATE_OUTLIERS` is set to 'no', you have to make cyberattacks on your own network. If you are in a Wifi network, try to download any **network scanning tool in order to make outliers in the data**. For that, you can use your smartphone or tablet. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). If want to use a distinct PC computer to perform cyberattacks, you can employ `nmap, arp-scan, netdiscover...` or any network scanning tool you know. Make sure that the devices your perform the cyberattacks and BCAST_IDS are connected in the same network.
 4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the dataset has 10.000-12.000 lines.
 6. At the same time you can also see the .json files. Remember that their time expiration can be modified in config.txt file through `UPDATE_TIME_JSON_HOUR`, `UPDATE_TIME_JSON_12HOURS`, `UPDATE_TIME_JSON_WEEK` and `UPDATE_TIME_JSON_MONTH` properties.
 
