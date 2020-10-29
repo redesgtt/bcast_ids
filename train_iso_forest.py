@@ -122,7 +122,8 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
             # GENERATE OUTLIERS set to 'yes'
             if generate_outliers:
                 message = (f"{dia} {hora} - GENERATE_OUTLIERS set to 'yes'. Automated training was successful with contamination {c}. ML model created at {os.getcwd()}/{filename}\n"
-                f"\t\t   RESULTS: {len(df_outliers.axes[0])} anomalies generated / {len(df.loc[pred==-1].axes[0])} anomalies detected = {len(df_outliers.axes[0])/len(df.loc[pred==-1].axes[0]) * 100} % accuracy.\n"
+                f"\t\t   Using the first {len(df.axes[0])} rows of the {dataset} at the time of automated training \n"
+                f"\t\t   RESULTS: {len(df_outliers.axes[0])} anomalies generated / {len(df.loc[pred==-1].axes[0])} anomalies detected = {len(df_outliers.axes[0])/len(df.loc[pred==-1].axes[0]) * 100} % accuracy \n"
                 f"The anomalies detected were: \n {df.loc[pred==-1].to_string()} \n\n"
                 )
                 #print(message)
