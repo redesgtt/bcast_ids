@@ -167,8 +167,8 @@ if __name__ == '__main__':
                     print("\t\nERROR! The CONTAMINATION parameter must be in the range [0, 0.5]\n")
                 else:
                     print(f'\nTrainning the model with contamination {contamination} \n')
-                    #train_dataset(file, float(contamination))
-                    train_capture(file, float(contamination))
+                    train_dataset(file, float(contamination))
+                    #train_capture(file, float(contamination))
             except:
                 print("ERROR! Please enter a valid contamination number. Remember that it has to be in the range [0, 0.5] or 'auto'")
         else:
