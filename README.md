@@ -2,7 +2,6 @@
 *Gestión Tributaria Territorial (GTT), Network dept., Alicante (Spain), 2020*
 
 ## Table of Contents
-Table of contents
 =================
 [Abstract](#abstract)  
 [Description](#description) 
