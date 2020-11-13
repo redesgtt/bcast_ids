@@ -79,7 +79,7 @@ The training dataset is collected from a real-world connected environment. At th
 | SSDP  | Total SSDP traffic generated from a specific MAC address   |
 | ICMPv6  | Total ICMPv6s traffic generated from a specific MAC address   |
 
-Once the features were determined to fed the Isolation Forest algorithm later, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset should cover distinct attack types and attack-free circumstances. 
+Once the features were determined to fed the Isolation Forest algorithm later on, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset should cover distinct attack types and attack-free circumstances. 
 
 ## Running the BCAST_IDS
 ### Hardware Prerequisites
@@ -136,7 +136,7 @@ PORT_MAIL_SERVER=
 SENDER_EMAIL=
 RECEIVERS_EMAIL=
 ```
-The meaning of each property is detailed below:
+The meaning of each variable is detailed below:
 
 | Variable  | Description |
 | ------------- | ------------- |
@@ -177,28 +177,28 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 
 #### Preprocessing
 1. Firstly, **make sure you are as a 'root' user** and you fill up correctly the variables of config.txt file (`IFACE2`, `NET`, `EXCLUDE_MACS`...). Execute `./post.sh` in order to generate training data. Remember that in this phase the variable `GENERATE_DATASET` should set to 'yes'. Keep this script running. If you want to run it at the background you can type `./post.sh &` at the command prompt. Network traffic is analized each 10 seconds by default (`POST` variable).
-2. The dataset is now generating and is growing over time. Type `tail -f dataset.csv` at the command prompt to observe it.
-3. If you have set the varible `GENERATE_OUTLIERS` to yes the program will make outliers for you, that is typical cyberattack data patterns.
-3. If the variable `GENERATE_OUTLIERS` is set to 'no', you have to make cyberattacks on your own network. If you are in a Wifi network, try to download any **network scanning tool in order to make outliers in the data**. For that, you can use your smartphone or tablet. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). If want to use a distinct PC computer to perform cyberattacks, you can employ `nmap, arp-scan, netdiscover...` or any network scanning tool you know. Make sure that the devices your perform the cyberattacks and BCAST_IDS are connected in the same network.
-4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the dataset has 10.000-12.000 lines.
+2. The training dataset is now generating and is growing over each `POST` seconds (10 seconds by default). Type `tail -f dataset.csv` at the command prompt to observe it.
+3. If you have set the varible `GENERATE_OUTLIERS` to 'yes', the system will make outliers for you, that is typical cyberattack data patterns.
+3. If the variable `GENERATE_OUTLIERS` is set to 'no', you have to make **cyberattacks on your own network**. If you are in a Wifi network, try to download any **network scanning tool in order to make outliers in the data** for example. For that, you can use your smartphone or tablet. There are plenty of them in the App Store (iOs) or Play Store (Android), i.e. [Net Analyzer](https://play.google.com/store/apps/details?id=net.techet.netanalyzerlite.an&hl=es_419). If want to use a distinct PC computer to perform cyberattacks, you can employ `nmap, arp-scan, netdiscover...` or any network scanning tool you know. Make sure that the devices your perform the cyberattacks and BCAST_IDS are connected in the same network.
+4. Observe the data which is generated in the `dataset.csv`. Combine normal and abnormal entries. It is highly recommended that the training dataset has 10.000-12.000 lines.
 6. At the same time you can also see the .json files. Remember that their time expiration can be modified in config.txt file through `UPDATE_TIME_JSON_HOUR`, `UPDATE_TIME_JSON_12HOURS`, `UPDATE_TIME_JSON_WEEK` and `UPDATE_TIME_JSON_MONTH` properties.
 
 #### Trainning
 ##### Automated training
-1. If there is no a Machine Learning model in the bcast_ids directory, the system can extract data patterns automatically from the data collected at `dataset.csv` so far, taking into account the countdown specified in `TIME_AUTOMATED_TRAINING`. Also, make sure `AUTOMATED_TRAINING` is set to 'yes'. Remember you can adjust the contamination parameter of the Isolation Forest algorithm in the config file (it is set to 'auto' by default).
+1. If there is no a Machine Learning model in the bcast_ids directory, the system can extract data patterns automatically from the data collected in `dataset.csv` so far, taking into account the countdown specified in `TIME_AUTOMATED_TRAINING`. Also, make sure `AUTOMATED_TRAINING` is set to 'yes'. Remember you can adjust the contamination parameter of the Isolation Forest algorithm in the config file (it is set to 'auto' by default).
 2. Once the countdown is over and if everything went as expected, a model will be created in the bcast_ids folder with the name `model_iso_forest.bin` and the results could be checked at the file `training_messages.log`. Otherwise, an message error will appear at the aforementioned log file.
 3. Additionally, you can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 ##### Manual training
-1. You can use the script `./train_iso_forest.py` manually to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm (the will pop up at the screen after executing the training script)
-2. Soon afterward, a model will be generated with the name `model_iso_forest.bin`. Make sure that the model is located in the main project directory (./bcast_ids).
+1. You can use the script `./train_iso_forest.py` manually to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm (the will pop up at the screen after executing the training script).
+2. Soon afterward, a model will be generated with the name `model_iso_forest.bin`. Note that this model is located in the main project directory:  `./bcast_ids/model_iso_forest.bin`.
 3. Make some tests with the script `./predict_iso_forest.py` and verify the effectiveness of the Isolation Forest algorithm.
 4. You can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 #### Detection
-1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network using the monitoring data each `POST` seconds! If you wish, you can set `GENERATE_DATASET` to 'no' because we do not need saving the data in a file (the model was generated in the previous phase). It is up to you! So, if the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover if the system detects a new MAC in the network which was not in `tm-month.json`, it will be registered at `new_macs_detected.log`. 
-2. Furthermore, a network capture will be saved if the algorithm detects any abnormal activity at the `./bcast_ids/forensic` directory.
-3. Finally, if you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and complete the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or there was a problem.
+1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network using the monitoring data each `POST` seconds! If you wish, you can set `GENERATE_DATASET` to 'no' because we do not need saving the data in a file (the model was generated in the previous phase). It is up to you! So, if the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover, if the system detects a new MAC in the network which was not in `tm-month.json`, it will be registered at `new_macs_detected.log`. 
+2. Furthermore, if the algorithm detects any abnormal activity, a network capture (.pcap file) will be saved in the `./bcast_ids/forensic` directory.
+3. Finally, if you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not.
 
 ## References
 1. Buczak AL, Guven E (2016) A survey of data mining and machine learning methods for cyber security intrusion detection. IEEE Commun Surv Tutor 18(2):1153–1176. https://doi.org/10.1109/COMST.2015.2494502
