@@ -4,6 +4,7 @@
 ## Table of Contents  
    * [Abstract](#abstract)
    * [Description](#description)
+      * [Architecture at a glance](#architecture-at-a-glance)
       * [Dataset Generation](#dataset-generation)
    * [Running the BCAST_IDS](#running-the-bcast_ids)
       * [Hardware Prerequisites](#hardware-prerequisites)
@@ -31,6 +32,7 @@ There are three main phases to make this project comes true:
 2. **Training:** a Machine Learning algorithm is used to extract patterns from the data collected previously. Then, a system model is built.
 3. **Detection:** the monitored traffic data will be used as system input to be compared to the generated system model. If the pattern of the observation is matched with a potential threat, an alarm will be triggered and it will indicate a feasible network intrusion.
 
+### Architecture at a glance
 The following picture represents an overview of the BCAST_IDS architecture:
 
 ![alt text](https://user-images.githubusercontent.com/69505347/96608639-e6025000-12f9-11eb-9089-6d20bb856c5e.png)
