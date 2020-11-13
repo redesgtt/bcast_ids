@@ -9,7 +9,7 @@
    * [Running the BCAST_IDS](#running-the-bcast_ids)
       * [Hardware Prerequisites](#hardware-prerequisites)
       * [Software Prerequisites](#software-prerequisites)
-      * [Configuration files](#configuration-files)
+      * [Configuration file](#configuration-file)
       * [Run the Project](#run-the-project)
         * [Download](#download)
         * [Preprocessing](#preprocessing)
@@ -111,7 +111,7 @@ BCAST_IDS requires **`Python 3` branch** and the additional libraries listed bel
 dpkt psutil numpy pandas sklearn
 ```
 
-### Configuration files
+### Configuration file
 You can modify the `config.txt` file and fill up the variables on your own. **Time is always represented in seconds**:
 ```
 #####################################################################################
