@@ -580,6 +580,7 @@ def send_email(*args):
     macs_atacando = args[4]
 
     sender_email = configFile_value.get('SENDER_EMAIL')
+    sender_password = configFile_value.get('SENDER_PASSWORD')
     receivers_email = args[2]
 
     mail_server = configFile_value.get('MAIL_SERVER')
@@ -619,15 +620,20 @@ def send_email(*args):
 
             text = message.as_string()
             with smtplib.SMTP(mail_server, port_mail_server) as server:
+                if sender_password:
+                    server.starttls() #enable security
+                    server.login(sender_email, sender_password) #login with mail_id and password
                 server.sendmail(sender_email, receiver_email, text)
-                # Registramos en un fichero de log si se ha enviado el mensaje
-                if configFile_value.get('GENERATE_LOG_FILES')=='yes':
-                    save_text("email_messages.log", f"{dia} {hora} e-Mail sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n", "a")
+                server.quit()
 
-    except:
+                # Registramos en un fichero de log si se ha enviado el mensaje
+            if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+                save_text("email_messages.log", f"{dia} {hora} e-Mail sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n", "a")
+
+    except Exception as e:
         # Registramos en un fichero de log si NO se ha enviado el mensaje por correo electronico
         if configFile_value.get('GENERATE_LOG_FILES')=='yes':
-            save_text("email_messages.log", f"{dia} {hora} ERROR! e-Mail was not sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n\t\t NOTES: Check values of MAIL_SERVER, PORT_MAIL_SERVER, SENDER_EMAIL and RECEIVERS_EMAIL (config.txt). Verify if you have privileges to send mails with that mail server. \n", "a")
+            save_text("email_messages.log", f"{dia} {hora} ERROR! e-Mail was not sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n\t\t NOTES: {e}. \n", "a")
 
 if __name__ == '__main__':
     try:

@@ -25,7 +25,7 @@ UPDATE_TIME_JSON_MONTH=2592000
 # Enable to generate log files (email_messages.log, macs_abnormal_act.log, messages_training.log, new_macs_detected.log)
 GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
-AUTOMATED_TRAINING=yes
+AUTOMATED_TRAINING=no
 ## Time to automate training (in seconds)
 TIME_AUTOMATED_TRAINING=7200
 ## Enable to generate outliers
@@ -38,4 +38,6 @@ SEND_EMAIL=no
 MAIL_SERVER=
 PORT_MAIL_SERVER=
 SENDER_EMAIL=
+### In case you need to type a password to send emails (plain text)
+SENDER_PASSWORD=
 RECEIVERS_EMAIL=
