@@ -154,6 +154,8 @@ SEND_EMAIL=no
 MAIL_SERVER=
 PORT_MAIL_SERVER=
 SENDER_EMAIL=
+### In case you need to type a password to send emails (plain text)
+SENDER_PASSWORD=
 RECEIVERS_EMAIL=
 ```
 The meaning of each variable is detailed below:
@@ -179,6 +181,7 @@ The meaning of each variable is detailed below:
 | `MAIL_SERVER`  | Mail server name |
 | `PORT_MAIL_SERVER`  | Port mail server |
 | `SENDER_EMAIL`  | Sender email |
+| `SENDER_PASSWORD`  | Sender password. If you are using TLS/STARTTLS port, you probably have to fill up this |
 | `RECEIVERS_EMAIL`  | Receivers mail. If there are two or more, they should separate by ',' i.e. RECEIVERS_EMAIL=mail1@tesbcast.com,mail2@tesbcast.com.  |
 
 ### Run the Project
