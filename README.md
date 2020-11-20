@@ -138,8 +138,6 @@ UPDATE_TIME_JSON_12HOURS=43200
 UPDATE_TIME_JSON_WEEK=604800
 ## Update time tm-month.json (in seconds)
 UPDATE_TIME_JSON_MONTH=2592000
-# Enable to generate log files (email_messages.log, macs_abnormal_act.log, messages_training.log, new_macs_detected.log)
-GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
@@ -175,7 +173,6 @@ The meaning of each variable is detailed below:
 | `GENERATE_LOG_FILES`  | Enable to generate log files (email_messages.log, macs_abnormal_act.log, messages_training.log, new_macs_detected.log) |
 | `AUTOMATED_TRAINING`  | In order to train the algorithm automatically (yes/no) |
 | `TIME_AUTOMATED_TRAINING`  | Countdown to train the algorithm with the training dataset and generate the model automatically. It is 7200 seconds by default |
-| `GENERATE_OUTLIERS`  | Enable to generate outliers automatically |
 | `CONTAMINATION`  | It specifies the percentage of observations we believe to be outliers. It can be two different values: 'auto' or a float number.  If it is set to 'auto', contamination is equal to the number of ARP_noIP columns largest than 40 (its value is large in network scanning attacks) divided by total rows in the dataset at the time of automated trainning. If it is a number, the parameter must be between 0.0 and 0.5 |
 | `SEND_EMAIL`  | Enable or disable to send emails |
 | `MAIL_SERVER`  | Mail server name |
