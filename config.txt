@@ -32,10 +32,10 @@ GENERATE_OUTLIERS=yes
 CONTAMINATION=auto
 
 ## Allow sending emails from BCAST_IDS (yes/no)
-SEND_EMAIL=yes
-MAIL_SERVER=smtp.gmail.com
-PORT_MAIL_SERVER=587
-SENDER_EMAIL=redesgtt@gmail.com
+SEND_EMAIL=no
+MAIL_SERVER=
+PORT_MAIL_SERVER=
+SENDER_EMAIL=
 ### In case you need to type a password to send emails (plain text)
-SENDER_PASSWORD=#C0r0n4lrjjj2020.
-RECEIVERS_EMAIL=jgombao_log@gtt.es
+SENDER_PASSWORD=
+RECEIVERS_EMAIL=
