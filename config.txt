@@ -22,8 +22,6 @@ UPDATE_TIME_JSON_12HOURS=43200
 UPDATE_TIME_JSON_WEEK=604800
 ## Update time tm-month.json (in seconds)
 UPDATE_TIME_JSON_MONTH=2592000
-# Enable to generate log files (email_messages.log, macs_abnormal_act.log, messages_training.log, new_macs_detected.log)
-GENERATE_LOG_FILES=yes
 ## Enable auto-training (yes/no)
 AUTOMATED_TRAINING=no
 ## Time to automate training (in seconds)
@@ -33,11 +31,11 @@ GENERATE_OUTLIERS=yes
 ## Percentaje of the outliers in the data (auto, float number: 0 < CONTAMINATION < 0.5)
 CONTAMINATION=auto
 
-## Allow sending emails from BCAST_IDS (yes/no) 
-SEND_EMAIL=no
-MAIL_SERVER=
-PORT_MAIL_SERVER=
-SENDER_EMAIL=
+## Allow sending emails from BCAST_IDS (yes/no)
+SEND_EMAIL=yes
+MAIL_SERVER=smtp.gmail.com
+PORT_MAIL_SERVER=587
+SENDER_EMAIL=redesgtt@gmail.com
 ### In case you need to type a password to send emails (plain text)
-SENDER_PASSWORD=
-RECEIVERS_EMAIL=
+SENDER_PASSWORD=#C0r0n4lrjjj2020.
+RECEIVERS_EMAIL=jgombao_log@gtt.es

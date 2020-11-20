@@ -431,19 +431,6 @@ def print_mac_line():
         print(';'.join(map(str,value)))
 
 
-"""Registramos la primera vez que se ha visualizado una direccion MAC y que no se encuentre censada en el fichero JSON"""
-def check_macs():
-    MACS_nuevas = list()
-    dir = './tm-month.json'
-    macs_captura = list(mac_line.keys())
-    exists = os.path.isfile(dir)
-    if exists:
-        datos_json = load_json(dir)
-        for mac_captura in macs_captura:
-            if mac_captura not in datos_json:
-                save_text("new_macs_detected.log", f"{dia} {hora} - {mac_captura}\n", "a")
-
-
 """Guarda la captura en el directorio forensic"""
 def save_cap(macs_atacando):
     d = datetime.today().strftime('%Y-%m-%d-%H:%M')
@@ -490,9 +477,8 @@ def run_IA():
                 send_email_attack(macs_atacando)
 
             # Se registra en un fichero de log las MACs que han cometido alguna anomalia y su actividad
-            if configFile_value.get('GENERATE_LOG_FILES')=='yes':
-                for mac_atacando in macs_atacando:
-                    save_text("macs_abnormal_act.log", f"{dia} {hora} - MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
+            for mac_atacando in macs_atacando:
+                save_text("macs_abnormal_act.log", f"{dia} {hora} - MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
     else:
         if configFile_value.get('AUTOMATED_TRAINING')=='yes':
             if os.path.isfile('./time.tmp'):
@@ -511,8 +497,7 @@ def run_IA():
                     else:
                         result_train = train_capture(f"./{name_dataset}.csv",contamination, False)
 
-                    if configFile_value.get('GENERATE_LOG_FILES')=='yes':
-                        save_text("messages_training.log", result_train, "a")
+                    save_text("messages_training.log", result_train, "a")
             else:
                 save_text('./time.tmp', str(seconds), "w")
 
@@ -562,8 +547,6 @@ def send_email_attack(macs_atacando):
     # Completamos el cuerpo del mensaje
     body += txt_dir_IP_MAC
     body += dir_IP_MAC
-    body += "\n" + ubicacion_fisica
-    body += mac_interfaz_switch
     body += "\n\nActivity: \n"
     body += registro_mac
     body += txt_ARP_nIP
@@ -571,6 +554,13 @@ def send_email_attack(macs_atacando):
 
     # Enviamos el mensaje con el fichero pcap adjunto
     send_email(subject,body,receivers_email,True,macs_atacando)
+
+""" Funcion que permite enviar un correo electronico cuando se incia el programa """
+def send_email_ok():
+    receivers_email = configFile_value.get('RECEIVERS_EMAIL').split(",")
+    subject = "Email from BCAST_IDS sended correctly!"
+    body = "Congrats! This email means that you have configured sending emails successfully. BCAST_IDS will let you know when network anomaly is detected."
+    send_email(subject,body,receivers_email,False,None)
 
 """Envio de correos electronicos con el Asunto y Cuerpo del mensaje deseado"""
 def send_email(*args):
@@ -626,17 +616,25 @@ def send_email(*args):
                 server.sendmail(sender_email, receiver_email, text)
                 server.quit()
 
-                # Registramos en un fichero de log si se ha enviado el mensaje
-            if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+            # Registramos en un fichero de log si se ha enviado el mensaje
+            if macs_atacando != None:
                 save_text("email_messages.log", f"{dia} {hora} e-Mail sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n", "a")
+            else:
+                save_text("email_messages.log", f"{dia} {hora} first e-Mail sent to {', '.join(map(str,receivers_email))} \n", "a")
 
     except Exception as e:
         # Registramos en un fichero de log si NO se ha enviado el mensaje por correo electronico
-        if configFile_value.get('GENERATE_LOG_FILES')=='yes':
+        if macs_atacando != None:
             save_text("email_messages.log", f"{dia} {hora} ERROR! e-Mail was not sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n\t\t NOTES: {e}. \n", "a")
+        else:
+            save_text("email_messages.log", f"{dia} {hora} ERROR! first e-Mail was not sent to {', '.join(map(str,receivers_email))}. Check your mail server configuration. \n\t\t If you want to check again the intregation of sending emails with BCAST_IDS, delete the file 'email_messages.log' and see again the results. \n\t\t NOTES: {e}. \n", "a")
 
 if __name__ == '__main__':
     try:
+        # Si no se encuentra el fichero de log email_messages.log, se realiza un primer intento de envio de correo electronico para comprobar si se ha configurado correctamente el servidor de correo.
+        if not os.path.isfile('email_messages.log') and configFile_value.get('SEND_EMAIL') == 'yes':
+            send_email_ok()
+
         # Generamos los diccionarios de tm, tip, externos, ti6 e ipm
         f = open(sys.argv[1],'rb')
         pcap = dpkt.pcap.Reader(f)
@@ -672,10 +670,6 @@ if __name__ == '__main__':
         pcapa = dpkt.pcap.Reader(fa)
         mac_lines(pcapa)
         fa.close()
-
-        # Comprueba si se ha detectado una direccion MAC que no esta en el tm-month y lo almacena en un fichero de LOG
-        if configFile_value.get('GENERATE_LOG_FILES')=='yes':
-            check_macs()
 
         # Generamos fichero de MACs censadas en 1 mes
         if tm:
