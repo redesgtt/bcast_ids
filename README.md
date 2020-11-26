@@ -155,6 +155,11 @@ SENDER_EMAIL=
 ### In case you need to type a password to send emails (plain text)
 SENDER_PASSWORD=
 RECEIVERS_EMAIL=
+
+## Allow to send alerts with Telegram
+TELEGRAM_INTEGRATION=no
+BOT_TELEGRAM_TOKEN=
+CHAT_ID=
 ```
 The meaning of each variable is detailed below:
 
@@ -180,6 +185,9 @@ The meaning of each variable is detailed below:
 | `SENDER_EMAIL`  | Sender email |
 | `SENDER_PASSWORD`  | Sender password. If you are using TLS/STARTTLS port, you probably have to fill up this |
 | `RECEIVERS_EMAIL`  | Receivers mail. If there are two or more, they should separate by ',' i.e. RECEIVERS_EMAIL=mail1@tesbcast.com,mail2@tesbcast.com.  |
+| `TELEGRAM_INTEGRATION`  | Enable or disable to send messages through a Telegram bot |
+| `BOT_TELEGRAM_TOKEN`  | API Key of the Telegram BOT |
+| `CHAT_ID`  | User identifier to send messages when anomaly is detected  |
 
 ### Run the Project
 
