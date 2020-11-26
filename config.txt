@@ -39,3 +39,8 @@ SENDER_EMAIL=
 ### In case you need to type a password to send emails (plain text)
 SENDER_PASSWORD=
 RECEIVERS_EMAIL=
+
+## Allow to send alerts with Telegram
+TELEGRAM_INTEGRATION=no
+BOT_TELEGRAM_TOKEN=
+CHAT_ID=

@@ -32,6 +32,7 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from predict_iso_forest import predict_capture
 from train_iso_forest import train_capture
+from telegram_integration import send_message_telegram
 
 """Guarda JSON"""
 def save_json(obj, name):
@@ -475,6 +476,33 @@ def run_IA():
             # Se envia correo electronico
             if configFile_value.get('SEND_EMAIL') == 'yes':
                 send_email_attack(macs_atacando)
+
+            # Se envia alerta por Telegram
+            if configFile_value.get('TELEGRAM_INTEGRATION')=='yes':
+                # Obtenemos el chat_id:
+                chats_id = configFile_value.get('CHAT_ID').split(",")
+                for chat_id in chats_id:
+
+                    # Generamos el mensaje
+                    activity_mac = ""
+                    message_to_telegram = ""
+                    for mac_atacando in macs_atacando:
+                        activity_mac += mac_atacando+ ";" + ';'.join(map(str,mac_line[mac_atacando])) + "\n"
+
+                    if  int(len(macs_atacando))==1:
+                        message_to_telegram = f"Abnormal MAC detected! \n{activity_mac}"
+                    else:
+                        message_to_telegram = f"Abnormal MACs detected! \n{activity_mac}"
+
+                    # Realizamos el intento de envio de mensaje por Telegram
+                    results_telegram = send_message_telegram(message_to_telegram, chat_id)
+                    message_to_log = message_to_telegram.replace('\n'," ")
+
+                    # Almacenamos el resultado en un fichero de log
+                    if results_telegram[0]:
+                        save_text("telegram_messages.log", f"{dia} {hora} - OK: Telegram message sent to CHAT_ID {chat_id} -{message_to_log}\n", "a")
+                    else:
+                        save_text("telegram_messages.log", f"{dia} {hora} - ERROR {results_telegram[1]} - Telegram message was not sent to CHAT_ID {chat_id} - {message_to_log}\n", "a")
 
             # Se registra en un fichero de log las MACs que han cometido alguna anomalia y su actividad
             for mac_atacando in macs_atacando:
