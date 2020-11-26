@@ -35,7 +35,7 @@ There are three main phases to make this project comes true:
 ### Architecture at a glance
 The following picture represents an overview of the BCAST_IDS architecture:
 
-![alt text](https://user-images.githubusercontent.com/69505347/96608639-e6025000-12f9-11eb-9089-6d20bb856c5e.png)
+![alt text](https://user-images.githubusercontent.com/69505347/100358073-e75c2200-2ff5-11eb-829d-a3e66906109b.png)
 
 The system will also generate the following files:
 - **JSON files: (time is represented as a integer number expressed in seconds since the epoch, in UTC)**
