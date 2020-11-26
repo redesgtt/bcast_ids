@@ -23,7 +23,7 @@ UPDATE_TIME_JSON_WEEK=604800
 ## Update time tm-month.json (in seconds)
 UPDATE_TIME_JSON_MONTH=2592000
 ## Enable auto-training (yes/no)
-AUTOMATED_TRAINING=no
+AUTOMATED_TRAINING=yes
 ## Time to automate training (in seconds)
 TIME_AUTOMATED_TRAINING=7200
 ## Enable to generate outliers
