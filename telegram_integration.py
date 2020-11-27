@@ -90,24 +90,25 @@ def send_message_telegram(text, chat_id):
         return (sended,cad_error)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='''Script to test the integration with Telegram''')
-    parser.add_argument('-i', '--chat_id', action='store_true', help=f"Obtain the last chat_id of the URL: {URL}getUpdates in order to send emails to your channel")
-    parser.add_argument("-t", "--send_message", nargs=1, help="Send a message to your chat_id")
+    #parser = argparse.ArgumentParser(description='''Script to test the integration with Telegram \n\t\t./telegram_integration.py -i \n\t\t./telegram_integration -t [chat_id]''')
+    parser = argparse.ArgumentParser(" Script to test the integration with Telegram. Examples of execution: \n\t./telegram_integration.py -i \n\t./telegram_integration -t [CHAT_ID]\n\n")
+    parser.add_argument('-i', action='store_true', help=f"Obtain the last chat_id of the user which has sent a message to the Telegram bot: {URL}getUpdates")
+    parser.add_argument("-t", "--chat_id", nargs=1, help="Send a test message to the CHAT_ID specified to try if you have configured the integration with Telegram correctly")
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
-    if args.chat_id:
+    if args.i:
         result = get_chatID()
         # Print chat_id
         if result[0] != None:
             print(f"Chat_ID: {result[0]}")
         # Print the errors if there were any
         else:
-            print(f"ERROR - {result[1]}. The chat_id was not obtained successfully. Check if you typed properly the TELEGRAM_TOKEN property in the config.txt file or you have initialized the bot in Telegram correctly.")
+            print(f"ERROR - {result[1]}. The chat_id was not obtained successfully. Check if you typed properly the BOT_TELEGRAM_TOKEN property in the config.txt file or you have initialized the bot in Telegram correctly.")
 
     # Send a message to try the configuration of Telegram
-    if args.send_message:
-        result_message = send_message_telegram("Congrats! You have configured successfully the integration with Telegram!",args.send_message[0])
+    if args.chat_id:
+        result_message = send_message_telegram("Congrats! You have configured successfully the integration with Telegram!",args.chat_id[0])
         if result_message[0]:
-            print(f"Congrats! A test message was sent to {args.send_message[0]}. Check your Telegram bot")
+            print(f"Congrats! A test message was sent to {args.chat_id[0]}. Check your Telegram bot")
         else:
-            print(f"Error! A test message was not sent to {args.send_message[0]} - {result_message[1]}")
+            print(f"Error! A test message was not sent to {args.chat_id[0]} - {result_message[1]}")
