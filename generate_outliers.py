@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 from numpy.random import seed
 from numpy.random import randint
@@ -21,7 +21,7 @@ def generateOutliers(num):
     # PORT SCANNING:
     for i in range(num):
         l = [0] * 18
-        l[0] = randint(260, 800)
+        l[0] = randint(240, 800)
         l[1] = 0
         aux = 0
         aux = randint(0, 50)
@@ -51,7 +51,6 @@ def generateOutliers(num):
         else:
             l[17] = 0
         l = ['automated_outlier'] + l
-        print(l)
         lista_actividad.append(l)
     return lista_actividad
 
@@ -75,3 +74,13 @@ def outliers_to_dataframe(num):
 
     finally:
         return dataFrame
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(" Script make manual outliers in the data. Examples of execution: \n\t./generate_outliers.py -n [num] \n\n")
+    parser.add_argument("-n", "--num_outliers", nargs=1, help="Print cyberattack data patterns (network scanning, SSDP attacks etc)")
+    args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+
+    if args.num_outliers:
+        outliers = generateOutliers(int(args.num_outliers[0]))
+        for i in outliers:
+            print(';'.join([str(elem) for elem in i]))
