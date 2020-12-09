@@ -229,7 +229,7 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 3. If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not.
 
 1. Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow the following steps:
-   - Make sure you have the Telegram app downloaded on our smartphone and you are able to send and receive messages using this application.
+   - Make sure you have the Telegram app downloaded on your smartphone and you are able to send and receive messages using this application.
    - Next, you need to make a bot, which is a third-party application that runs inside Telegram. In our case, the bot will notify us when an anomaly is detected the network. We can create the bot by talking to BotFather and follow a few simple steps.
    - You can type the /help command to view all the possibilities which you can do with BotFather. Since it is required to create a bot, write “/newbot” and follow the instructions that BotFather tells you.   
    - Once you received your authorization token, paste it into `BOT_TELEGRAM_TOKEN` property of the config.txt file.
