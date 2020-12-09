@@ -57,7 +57,7 @@ The system will also generate the following files:
 | ------------- | ------------- |
 | **macs_abnormal_act.log**  | It indicates the MACs that the algorithm has detected as abnormal |
 | **messages_training.log**  | It indicates if the automated training of the algorithm was okay or not  |
-| **new_macs_detected.log**  | MACs detected for the first time and which are not found in the tm-month.json file before  |
+| **telegram_messages.log.log**  | File that records the messages sended using Telegram |
 | **email_messages.log**  | It indicates if the email was sent correctly or not |
 
 - **PCAP files**
