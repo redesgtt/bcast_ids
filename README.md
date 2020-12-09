@@ -227,9 +227,12 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network using the monitoring data each `POST` seconds! If you wish, you can set `GENERATE_DATASET` to 'no' because we do not need saving the data in a file (the model was generated in the previous phase). It is up to you! So, if the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`. Moreover, if the system detects a new MAC in the network which was not in `tm-month.json`, it will be registered at `new_macs_detected.log`. 
 2. Furthermore, if the algorithm detects any abnormal activity, a network capture (.pcap file) will be saved in the `./bcast_ids/forensic` directory.
 3. If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not.
-4. Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow the following steps:
-   4.1. Make sure you have the Telegram app downloaded on our smartphone and you are able to send and receive messages using this application.
-   4.2. Next, you need to make a bot, which is a third-party application that runs inside Telegram. In our case, the bot will notify us when an anomaly is detected in our network. We can create the bot by talking to BotFather and follow a few simple steps. 
+
+1. Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow the following steps:
+   - Make sure you have the Telegram app downloaded on our smartphone and you are able to send and receive messages using this application.
+   - Next, you need to make a bot, which is a third-party application that runs inside Telegram. In our case, the bot will notify us when an anomaly is detected in our network. We can create the bot by talking to BotFather and follow a few simple steps. 
+
+
    4.3. Moreover, you can type the /help command to view all the possibilities which you can do with this functionality. Since we want to create a bot, write “/newbot” and follow the instructions.
   4.4. Once you received your authorization token, paste it into `BOT_TELEGRAM_TOKEN` property of the config.txt file.
   4.5. After that, search the bot you have just created:
