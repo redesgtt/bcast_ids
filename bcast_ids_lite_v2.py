@@ -452,7 +452,7 @@ def save_cap(macs_atacando):
 
 """ Prediccion de la actividad de las direcciones MAC del dataset """
 def run_IA():
-    # Si se encuentra un modelo entrenado, realice la prediccion
+    # Si se encuentra un modelo entrenado, se realiza la prediccion con el algoritmo Isolation Forest
     if os.path.isfile('./predict_iso_forest.py') and os.path.isfile('./model_iso_forest.bin'):
         macs_atacando = []
 
@@ -464,13 +464,13 @@ def run_IA():
             aux.extend(value)
             to_dataFrame.append(aux)
 
-        # ISOLATION FOREST. Obtiene las direcciones MAC anomalas:
+        # ISOLATION FOREST. Obtiene las direcciones MAC anomalas de la captura de 10 segundos en curso
         macs_atacando = predict_capture(to_dataFrame)
 
-        # Si el algoritmo detecta alguna MAC que ha cometido alguna anomalia
+        # Si el algoritmo detecta alguna MAC que ha cometido alguna anomalia, el programa genera las siguientes alertas de seguridad:
         if macs_atacando:
 
-            # Se guarda la captura en un PCAP en forensic/numero_MAC
+            # Se guarda la captura en un PCAP en el directorio forensic/[direccion_MAC]
             save_cap(macs_atacando)
 
             # Se envia correo electronico
@@ -479,32 +479,9 @@ def run_IA():
 
             # Se envia alerta por Telegram
             if configFile_value.get('TELEGRAM_INTEGRATION')=='yes':
-                # Obtenemos el chat_id:
-                chats_id = configFile_value.get('CHAT_ID').split(",")
-                for chat_id in chats_id:
+                alerta_telegram(macs_atacando)
 
-                    # Generamos el mensaje
-                    activity_mac = ""
-                    message_to_telegram = ""
-                    for mac_atacando in macs_atacando:
-                        activity_mac += mac_atacando+ ";" + ';'.join(map(str,mac_line[mac_atacando])) + "\n"
-
-                    if  int(len(macs_atacando))==1:
-                        message_to_telegram = f"Abnormal MAC detected! \n{activity_mac}"
-                    else:
-                        message_to_telegram = f"Abnormal MACs detected! \n{activity_mac}"
-
-                    # Realizamos el intento de envio de mensaje por Telegram
-                    results_telegram = send_message_telegram(message_to_telegram, chat_id)
-                    message_to_log = message_to_telegram.replace('\n'," ")
-
-                    # Almacenamos el resultado en un fichero de log
-                    if results_telegram[0]:
-                        save_text("telegram_messages.log", f"{dia} {hora} - OK: Telegram message sent to CHAT_ID {chat_id} -{message_to_log}\n", "a")
-                    else:
-                        save_text("telegram_messages.log", f"{dia} {hora} - ERROR {results_telegram[1]} - Telegram message was not sent to CHAT_ID {chat_id} - {message_to_log}\n", "a")
-
-            # Se registra en un fichero de log las MACs que han cometido alguna anomalia y su actividad
+            # Se registra en el fichero de log macs_abnormal_act.log las MACs que han cometido alguna anomalia y su actividad:
             for mac_atacando in macs_atacando:
                 save_text("macs_abnormal_act.log", f"{dia} {hora} - MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
     else:
@@ -528,6 +505,44 @@ def run_IA():
                     save_text("messages_training.log", result_train, "a")
             else:
                 save_text('./time.tmp', str(seconds), "w")
+
+
+def alerta_telegram(macs_atacando):
+    header = "MAC;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP;SSDP;ICMPv6"
+    # Obtenemos el chat_id:
+    chats_id = configFile_value.get('CHAT_ID').split(",")
+
+    # Damos formato al mensaje para enviarlo por Telegram al chat_id especificado en el config
+    for chat_id in chats_id:
+        activity_mac = ""
+        activity_mac_log = ""
+        message_to_telegram = ""
+        cad = ""
+        for mac_atacando in macs_atacando:
+            activity_mac = mac_atacando+ ";" + ';'.join(map(str,mac_line[mac_atacando]))
+            activity_mac_log += activity_mac + " "
+            values = activity_mac.split(";")
+            count= 0
+            for i in header.split(";"):
+                if count+1 == len(header.split(";")):
+                    cad += f"{i}:{values[count]}\n\n"
+                else:
+                     cad += f"{i}:{values[count]}; "
+                count +=1
+
+        if  int(len(macs_atacando))==1:
+            message_to_telegram = f"Abnormal MAC detected! \n{cad}"
+        else:
+            message_to_telegram = f"Abnormal MACs detected! \n{cad.rstrip()}"
+
+        # Enviamos la alerta por Telegram al chat_id o los chat_ids indicados en el fichero config.txt
+        results_telegram = send_message_telegram(message_to_telegram, chat_id)
+
+        # Almacenamos el resultado en un fichero de log
+        if results_telegram[0]:
+            save_text("telegram_messages.log", f"{dia} {hora} - OK: Telegram message sent to CHAT_ID {chat_id} - {activity_mac_log}\n", "a")
+        else:
+            save_text("telegram_messages.log", f"{dia} {hora} - ERROR {results_telegram[1]} - Telegram message was not sent to CHAT_ID {chat_id} - {activity_mac_log}\n", "a")
 
 
 """Envio de un correo electronico debido a que se ha detectado que una MAC ha producido un ataque."""
@@ -554,7 +569,7 @@ def send_email_attack(macs_atacando):
     ## Actividad de la MAC
     ## Direcciones IP que ha preguntado y NO existen (valores de ARP_nIP)
     ## Direcciones IP que una MAC ha preguntado y SI existen (valores de IPF)
-    registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP\n"
+    registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6\n"
     for mac_atacando in macs_atacando:
         if len(macs_atacando) == 1:
             body = f"BCAST_IDS has detected that MAC {str(mac_atacando)} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
@@ -660,8 +675,8 @@ def send_email(*args):
 if __name__ == '__main__':
     try:
         # Si no se encuentra el fichero de log email_messages.log, se realiza un primer intento de envio de correo electronico para comprobar si se ha configurado correctamente el servidor de correo.
-        if not os.path.isfile('email_messages.log') and configFile_value.get('SEND_EMAIL') == 'yes':
-            send_email_ok()
+        # if not os.path.isfile('email_messages.log') and configFile_value.get('SEND_EMAIL') == 'yes':
+        #    send_email_ok()
 
         # Generamos los diccionarios de tm, tip, externos, ti6 e ipm
         f = open(sys.argv[1],'rb')
