@@ -61,6 +61,11 @@ def get_chatID(offset=None):
            last_update = num_updates - 1
            # We check that the chat_id is not a BOT
            if updates["result"][last_update]["message"]["from"]["is_bot"] == False:
+               # We obtain extra information such as name, surname and time in seconds
+               first_name = updates["result"][last_update]["message"]["chat"]["first_name"]
+               last_name = updates["result"][last_update]["message"]["chat"]["last_name"]
+               timestamp = updates["result"][last_update]["message"]["date"]
+               print(f"Last interaction with the bot: {first_name} {last_name} at {timestamp} seconds since the epoch, in UTC")
                chat_id = updates["result"][last_update]["message"]["chat"]["id"]
        else:
            cad_error = f"{updates['error_code']}: {updates['description']}"
