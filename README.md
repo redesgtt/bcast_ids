@@ -229,12 +229,12 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 3. If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not.
 4. Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow these steps:
    - Make sure you have the Telegram app downloaded on your smartphone and you are able to send and receive messages using this application.
-   - Next, you need to make a bot, which is a third-party application that runs inside Telegram. In our case, the bot will notify us when an anomaly is detected the network. We can create the bot by talking to [BotFather](https://core.telegram.org/bots) and follow a few simple steps.
+   - Next, you need to make a bot, which is a third-party application that runs inside Telegram. In our case, the bot will be the sender of the message you receive when an anomaly is detected in the network. You can create a bot by talking to [BotFather](https://core.telegram.org/bots), which is a Telegram bot which allows to create and manage your own Telegram bots. 
    - You can type the /help command to view all the possibilities which you can do with BotFather. Since it is required to create a bot, write “/newbot” and follow the instructions that BotFather tells you.   
-   - Once you received your authorization token, paste it into `BOT_TELEGRAM_TOKEN` property of the config.txt file.
-   - After that, search the bot you have just created in the Telegram search bar. Click it and press /start. After this, the bot will capture your chat_id, that is, a unique and invariable identifier that Telegram has assigned you to maintain permanent communication with the bot.   
+   - Once you received your authorization token, paste it into the `BOT_TELEGRAM_TOKEN` property of the config.txt file.
+   - After that, search in the Telegram search bar the bot you have just created. Click it and press /start. After this, the bot will capture your chat_id, that is, a unique and invariable identifier that Telegram has assigned you to maintain permanent communication with the bot.   
    - Then, execute the script `./telegram_integration.py -i` to obtain your chat_id.
-   - You can try to send a message using the option `./telegram_integration -t [CHAT_ID]` and see if you receive an alert from your bot like this: “Congrats! You have configured successfully the integration with Telegram!”
+   - You can try to send a message using the option `./telegram_integration -t [CHAT_ID]` and see if you receive an alert from your bot like this: *“Congrats! You have configured successfully the integration with Telegram!”*
    - Finally, you have to copy your chat_id and paste it into the `CHAT_ID` property and set the `TELEGRAM_INTEGRATION` to ‘yes’ in the config.txt. At this time, the system will send an alert when an anomaly is detected to your Telegram account using the bot you have created. The log results will be registered at `telegram_messages.log`.
 
 ## References
