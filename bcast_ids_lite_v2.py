@@ -74,6 +74,26 @@ def ip_addr (c) :
     d = "%d.%d.%d.%d" % (c[0],c[1],c[2],c[3])
     return d
 
+
+""" Devuelve un diccionario con la direccion IPv4, IPv6 y direccion MAC de la sonda (PC donde se encuentra instalado el BCAST_IDS)"""
+def info_sonda():
+    # Obtiene la direccion IPv4, IPv6 y MAC de la sonda u ordenador donde se encuentra instalado el programa de BCAST_IDS
+    if not os.path.isfile('./ipv4_ipv6_mac.tmp'):
+        s = "/sbin/ifconfig eth0 | grep -e ether -e inet | awk '{print $2}' > ipv4_ipv6_mac.tmp"
+        os.system(s)
+
+    dict_info_sonda = {
+        "ipv4": read_text('./ipv4_ipv6_mac.tmp').split('\n')[0],
+        "ipv6": read_text('./ipv4_ipv6_mac.tmp').split('\n')[1],
+        "mac": read_text('./ipv4_ipv6_mac.tmp').split('\n')[2]
+    }
+
+    return dict_info_sonda
+
+# Informacion de la sonda (IPV4, IPv6 y MAC)
+dict_info_sonda = info_sonda()
+
+
 """ Devuelve un diccionario con todos los valores del fichero config.txt """
 def getValuesConfig():
     configFile_value = dict()
@@ -124,7 +144,8 @@ mac_nip = dict()
 # Diccionario de las MACs que han preguntado por direcciones IP que si que existen (peticiones ARP)
 mac_ipf = dict()
 ts = 0
-
+# Diccionario que obtiene las direcciones MACs que han realizado una solicitud ARP, IPv4 o IPv6 a la sonda
+macAccess_protocol = dict()
 
 """Genera ficheros JSON: ipf, ipm, ti6, tip, tm"""
 def generate_file(dir, datos_captura, ag):
@@ -298,6 +319,8 @@ def count_packets(*args):
     mac_src = args[3]
     mac_dst = args[4]
     eth_type = args[5]
+    mac_sonda = args[6]
+    proto = args[7]
 
     attributes[0] += 1
 
@@ -320,6 +343,8 @@ def count_packets(*args):
         arp_opcode = binascii.hexlify(payload[20:22]).decode()
         ip_src = ip_addr(payload[28:32])
         ip_dst = ip_addr(payload[38:42])
+
+        # COMPLETAMOS LOS VALORES DEL DATASET
         if arp_opcode == '0001' and mac_dst == 'ffffffffffff':
             if ip_src == "0.0.0.0": # ARPpb
                 #print (mac_src,mac_dst,eth_type,arp_opcode,ip_src,ip_dst)
@@ -333,6 +358,15 @@ def count_packets(*args):
                 #print(mac_src, ip_src)
         elif arp_opcode == '0002' and mac_dst == 'ffffffffffff':
             attributes[7] += 1          # ARPgr
+
+        # Comprobamos si la MAC ha pregutado por la sonda usando el protocolo ARP
+        if mac_dst == mac_sonda:
+            #print(f"La MAC {mac_src} - {ip_src} ha preguntado por la sonda {mac_dst} - ARP - {eth_type}")
+            if mac_src not in macAccess_protocol:
+                proto.add('ARP')
+                macAccess_protocol[mac_src]=proto
+            else:
+                macAccess_protocol[mac_src].add('ARP')
 
     #IPv4
     elif eth_type == '0800':
@@ -358,17 +392,44 @@ def count_packets(*args):
         # IP_RESTO
         else: attributes[12]+=1
 
+        # Comprobamos si la MAC ha preguntado por la sonda usando el protocolo IPv4
+        if mac_dst == mac_sonda:
+            #print(f"La MAC {mac_src} - {ip_src} ha preguntado por la sonda {mac_dst} - IPv4 - {eth_type}")
+            if mac_src not in macAccess_protocol:
+                proto.add('IPv4')
+                macAccess_protocol[mac_src]=proto
+            else:
+                macAccess_protocol[mac_src].add('IPv4')
+
     # IPv6
     elif eth_type == '86dd':
         # Contabilizamos paquetes IPv6
         attributes[13]+=1
-
         # Contabilizamos paquetes ICMPv6 (icmpv6_opcode == 00):
         icmpv6_opcode = binascii.hexlify(payload[55:56]).decode()
         if icmpv6_opcode == '00':
             attributes[17]+=1
+
+        # Comprobamos si la MAC ha preguntado por la sonda usando el protocolo IPv6
+        if mac_dst == mac_sonda:
+            #print(f"La MAC {mac_src} - {ip_src} ha preguntado por la sonda {mac_dst} - IPv6 - {eth_type}")
+            if mac_src not in macAccess_protocol:
+                proto.add('IPv6')
+                macAccess_protocol[mac_src]=proto
+            else:
+                macAccess_protocol[mac_src].add('IPv6')
+
     # RESTO
-    else: attributes[14]+=1
+    else:
+        attributes[14]+=1
+        # Comprobamos si la MAC ha preguntado por la sonda usando otro protocolo
+        if mac_dst == mac_sonda:
+            #print(f"La MAC {mac_src} ha preguntado por la sonda {mac_dst} - {eth_type}")
+            if mac_src not in macAccess_protocol:
+                proto.add(eth_type)
+                macAccess_protocol[mac_src]=proto
+            else:
+                macAccess_proto[mac_src].add(eth_type)
 
 
 """Lee el PCAP y contabiliza el numero de paquetes para generar el DATATSET:
@@ -378,6 +439,11 @@ def mac_lines(pcap):
     num_attributes = 18
     attributes = [0] * num_attributes # Inicializamos la lista de valores de cada MAC a 0
     #print(attributes)
+
+    # Propiedades que utilizaremos para comprobar si una direccion MAC ha preguntado por la sonda
+    mac_sonda = dict_info_sonda.get("mac").replace(':','')
+    proto = set()
+
     for ts, payload in pcap:
         mac_src = binascii.hexlify(payload[6:12]).decode()
         mac_dst = binascii.hexlify(payload[0:6]).decode()
@@ -386,12 +452,12 @@ def mac_lines(pcap):
         # Contabilizamos la cantidad de paquetes para cada direccion MAC
         if mac_src in mac_line:
             attributes = mac_line[mac_src]
-            count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type)
+            count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type,mac_sonda,proto)
         else:
             if mac_src not in excluye_macs and mac_src in ipm_subred:
                 attributes = [0] * num_attributes
                 mac_line[mac_src] = attributes
-                count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type)
+                count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type,mac_sonda,proto)
 
     # IPF. Contabiliza el num de asociaciones IP (MACs que han preguntado por una direccion IP que existe)
     if ipf:
@@ -452,7 +518,8 @@ def save_cap(macs_atacando):
 
 """ Prediccion de la actividad de las direcciones MAC del dataset """
 def run_IA():
-    # Si se encuentra un modelo entrenado, se realiza la prediccion con el algoritmo Isolation Forest
+    AI_applied = False
+    # Si se encuentra un modelo entrenado se realiza la prediccion con el algoritmo Isolation Forest; o bien se analiza si una MAC ha preguntado por la MAC de la sonda
     if os.path.isfile('./predict_iso_forest.py') and os.path.isfile('./model_iso_forest.bin'):
         macs_atacando = []
 
@@ -464,8 +531,13 @@ def run_IA():
             aux.extend(value)
             to_dataFrame.append(aux)
 
-        # ISOLATION FOREST. Obtiene las direcciones MAC anomalas de la captura de 10 segundos en curso
-        macs_atacando = predict_capture(to_dataFrame)
+        macAccess_protocol = dict()
+        # Tomamos la decision si aplicamos IA o se ha preguntado por la MAC origen de la sonda
+        if not macAccess_protocol:
+            # ISOLATION FOREST. Obtiene las direcciones MAC anomalas de la captura de 10 segundos en curso
+            macs_atacando = predict_capture(to_dataFrame)
+        else:
+            macs_atacando= list(macAccess_protocol.keys())
 
         # Si el algoritmo detecta alguna MAC que ha cometido alguna anomalia, el programa genera las siguientes alertas de seguridad:
         if macs_atacando:
@@ -483,7 +555,7 @@ def run_IA():
 
             # Se registra en el fichero de log macs_abnormal_act.log las MACs que han cometido alguna anomalia y su actividad:
             for mac_atacando in macs_atacando:
-                save_text("macs_abnormal_act.log", f"{dia} {hora} - MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
+                save_text("macs_abnormal_act.log", f"{dia} {hora} - AI applied: {AI_applied} MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
     else:
         if configFile_value.get('AUTOMATED_TRAINING')=='yes':
             if os.path.isfile('./time.tmp'):
@@ -511,7 +583,10 @@ def alerta_telegram(macs_atacando):
     header = "MAC;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP;SSDP;ICMPv6"
     # Obtenemos el chat_id:
     chats_id = configFile_value.get('CHAT_ID').split(",")
+    # Obtenemos la MAC de la sonda
+    mac_sonda = dict_info_sonda.get("mac").replace(':','')
 
+    AI_applied = False
     # Damos formato al mensaje para enviarlo por Telegram al chat_id especificado en el config
     for chat_id in chats_id:
         activity_mac = ""
@@ -527,32 +602,40 @@ def alerta_telegram(macs_atacando):
                 if count+1 == len(header.split(";")):
                     cad += f"{i}:{values[count]}\n\n"
                 else:
-                     cad += f"{i}:{values[count]}; "
+                    cad += f"{i}:{values[count]}; "
                 count +=1
 
-        if  int(len(macs_atacando))==1:
-            message_to_telegram = f"Abnormal MAC detected! \n{cad}"
+        if not macAccess_protocol:
+            AI_applied = True
+            if  int(len(macs_atacando))==1:
+                message_to_telegram = f"Abnormal MAC detected by AI. The activity was: \n\n{cad}"
+            else:
+                message_to_telegram = f"Abnormal MACs detected by AI. The activity was: \n\n{cad.rstrip()}"
         else:
-            message_to_telegram = f"Abnormal MACs detected! \n{cad.rstrip()}"
+            message_to_telegram = "Abnormal activity detected!\n\n"
+            for mac_atacando in macs_atacando:
+                message_to_telegram += f"Source MAC address {''.join(map(str, mac_atacando))} has generated {'/'.join(map(str,macAccess_protocol[''.join(map(str, mac_atacando))]))} packets towards the BCAST_IDS MAC address destination ({mac_sonda})\n\n"
+            message_to_telegram += f"The activity was: \n{cad}"
 
         # Enviamos la alerta por Telegram al chat_id o los chat_ids indicados en el fichero config.txt
         results_telegram = send_message_telegram(message_to_telegram, chat_id)
 
         # Almacenamos el resultado en un fichero de log
         if results_telegram[0]:
-            save_text("telegram_messages.log", f"{dia} {hora} - OK: Telegram message sent to CHAT_ID {chat_id} - {activity_mac_log}\n", "a")
+            save_text("telegram_messages.log", f"{dia} {hora} - OK: Telegram message sent to CHAT_ID {chat_id} - AI applied: {AI_applied} - {activity_mac_log}\n", "a")
         else:
-            save_text("telegram_messages.log", f"{dia} {hora} - ERROR {results_telegram[1]} - Telegram message was not sent to CHAT_ID {chat_id} - {activity_mac_log}\n", "a")
+            save_text("telegram_messages.log", f"{dia} {hora} - ERROR {results_telegram[1]} - Telegram message was not sent to CHAT_ID {chat_id} - AI applied: {AI_applied} - {activity_mac_log}\n", "a")
 
 
 """Envio de un correo electronico debido a que se ha detectado que una MAC ha producido un ataque."""
 def send_email_attack(macs_atacando):
     global dia, hora
     receivers_email = configFile_value.get('RECEIVERS_EMAIL').split(",")
+    mac_sonda = dict_info_sonda.get("mac").replace(':','')
 
+    AI_applied = False
     # Inicializamos el texto a mostrar por correo
-    mac_interfaz_switch = ""
-    ubicacion_fisica = ""
+    body_protocols=""
     dir_IP_MAC =""
     txt_ARP_nIP=""
     txt_IPF =""
@@ -572,14 +655,23 @@ def send_email_attack(macs_atacando):
     registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6\n"
     for mac_atacando in macs_atacando:
         if len(macs_atacando) == 1:
-            body = f"BCAST_IDS has detected that MAC {str(mac_atacando)} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
+            if mac_atacando in macAccess_protocol:
+                body =f"BCAST_IDS has detected that source MAC address {str(mac_atacando)} has generated {'/'.join(map(str,macAccess_protocol[''.join(map(str, mac_atacando))]))} packets towards the BCAST_IDS MAC address destination ({mac_sonda}) on {dia} at {hora}. See attached network capture (.cap file)."
+            else:
+                AI_applied = True
+                body = f"BCAST_IDS has detected that MAC {str(mac_atacando)} had a suspicious behavior, using a Machine Learning algorithm, on {dia} at {hora}. See attached network capture (.cap file)."
         else:
-            body = f"BCAST_IDS has detected that MACs {', '.join(map(str,macs_atacando))} had a suspicious behavior on {dia} at {hora}. See attached network capture (.cap file). \n\nDETAILS:"
+            if mac_atacando in macAccess_protocol:
+                body =f"BCAST_IDS has detected that MAC Source MAC address {str(mac_atacando)} has generated the following protocols towards the BCAST_IDS MAC address destination ({mac_sonda}) on {dia} at {hora}. See attached network capture (.cap file)."
+                body_protocols += f"\n{mac_atacando}: {', '.join(map(str,macAccess_protocol[mac_atacando]))}"
+            else:
+                AI_applied = True
+                body = f"BCAST_IDS has detected that MACs {', '.join(map(str,macs_atacando))} had a suspicious behavior, using a Machine Learning algorithm, on {dia} at {hora}. See attached network capture (.cap file)."
         registro_mac += mac_atacando + ";"
         registro_mac += ';'.join(map(str,mac_line[mac_atacando])) +"\n"
         if mac_atacando in ipm_subred:
             txt_dir_IP_MAC = "\nIP address:"
-            dir_IP_MAC += f"\n{mac_atacando} -> {ipm_subred[mac_atacando]}"
+            dir_IP_MAC += f"\n{mac_atacando} - {ipm_subred[mac_atacando]}"
         if mac_atacando in mac_nip:
             txt_ARP_nIP += f"\nARP_noIP. IP addresses that MAC {mac_atacando} asked and DO NOT exist (ARP request): \n"
             txt_ARP_nIP += '; '.join(map(str,mac_nip[mac_atacando])) +"\n"
@@ -588,6 +680,8 @@ def send_email_attack(macs_atacando):
             txt_IPF += '; '.join(map(str,mac_ipf[mac_atacando])) +"\n"
 
     # Completamos el cuerpo del mensaje
+    body += body_protocols
+    body += "\n\nDETAILS"
     body += txt_dir_IP_MAC
     body += dir_IP_MAC
     body += "\n\nActivity: \n"
@@ -596,14 +690,14 @@ def send_email_attack(macs_atacando):
     body += txt_IPF
 
     # Enviamos el mensaje con el fichero pcap adjunto
-    send_email(subject,body,receivers_email,True,macs_atacando)
+    send_email(subject,body,receivers_email,True,macs_atacando,AI_applied)
 
 """ Funcion que permite enviar un correo electronico cuando se incia el programa """
 def send_email_ok():
     receivers_email = configFile_value.get('RECEIVERS_EMAIL').split(",")
     subject = "Email from BCAST_IDS sended correctly!"
     body = "Congrats! This email means that you have configured sending emails successfully. BCAST_IDS will let you know when network anomaly is detected."
-    send_email(subject,body,receivers_email,False,None)
+    send_email(subject,body,receivers_email,False,None,AI_applied)
 
 """Envio de correos electronicos con el Asunto y Cuerpo del mensaje deseado"""
 def send_email(*args):
@@ -611,7 +705,7 @@ def send_email(*args):
     body = args[1]
     attachment_pcap = args[3]
     macs_atacando = args[4]
-
+    AI_applied = args[5]
     sender_email = configFile_value.get('SENDER_EMAIL')
     sender_password = configFile_value.get('SENDER_PASSWORD')
     receivers_email = args[2]
@@ -661,14 +755,14 @@ def send_email(*args):
 
             # Registramos en un fichero de log si se ha enviado el mensaje
             if macs_atacando != None:
-                save_text("email_messages.log", f"{dia} {hora} e-Mail sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n", "a")
+                save_text("email_messages.log", f"{dia} {hora} e-Mail sent to {', '.join(map(str,receivers_email))} - AI applied: {AI_applied} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n", "a")
             else:
                 save_text("email_messages.log", f"{dia} {hora} first e-Mail sent to {', '.join(map(str,receivers_email))} \n", "a")
 
     except Exception as e:
         # Registramos en un fichero de log si NO se ha enviado el mensaje por correo electronico
         if macs_atacando != None:
-            save_text("email_messages.log", f"{dia} {hora} ERROR! e-Mail was not sent to {', '.join(map(str,receivers_email))} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n\t\t NOTES: {e}. \n", "a")
+            save_text("email_messages.log", f"{dia} {hora} ERROR! e-Mail was not sent to {', '.join(map(str,receivers_email))} - AI applied: {AI_applied} - MACs with abnormal activity: {', '.join(map(str,macs_atacando))} \n\t\t NOTES: {e}. \n", "a")
         else:
             save_text("email_messages.log", f"{dia} {hora} ERROR! first e-Mail was not sent to {', '.join(map(str,receivers_email))}. Check your mail server configuration. \n\t\t If you want to check again the intregation of sending emails with BCAST_IDS, delete the file 'email_messages.log' and see again the results. \n\t\t NOTES: {e}. \n", "a")
 
@@ -718,10 +812,9 @@ if __name__ == '__main__':
         if tm:
             generate_file('./tm-month.json', tm, AGING4)
 
-        # Aplicamos algoritmo IA para generar una decision
         run_IA()
 
     except FileNotFoundError:
         print(f"ERROR! File {sys.argv[1]} not found. Insert an existing network capture (.cap) as a first argument.")
-    except IndexError:
-        print("ERROR! Insert a valid network capture as a first argument. Example: ./bcast_ids_lite_v2.py [name_network_capture].cap")
+    except Exception as e:
+        print(e)

@@ -164,9 +164,9 @@ if __name__ == '__main__':
 
     ap = argparse.ArgumentParser(text_help)
     ap.add_argument("-n", "--scanning_network_attack", nargs=1, help="Print cyberattack data patterns (network scanning, SSDP attacks etc)")
-    ap.add_argument("-m", "--MAC", required=False, help="Direccion MAC")
-    ap.add_argument("-p", "--percentaje", required=False, help="Tunear los datos en un tanto por cento de su valor inicial")
-    ap.add_argument("-d", "--Dataset", required=False, help="Dataset")
+    ap.add_argument("-m", "--MAC", required=False, help="MAC address")
+    ap.add_argument("-p", "--percentaje", required=False, help="Modifies the data using a porcentual increment")
+    ap.add_argument("-d", "--Dataset", required=False, help="Dataset name")
     args = ap.parse_args(args=None if sys.argv[1:] else ['--help'])
 
     if args.scanning_network_attack:
