@@ -1,4 +1,14 @@
 #! /usr/bin/env python3
+
+##############################################################################################
+#                        BCAST_IDS: A NETWORK INTRUSION DETECTION SYSTEM
+#                           PREDICT WITH ISOLATION FOREST ALGORITHM
+#
+#                                      Dpto de Redes
+#                               Gestion Tributaria Territorial
+#                                           2020
+##############################################################################################
+
 import argparse
 import sys
 import os
@@ -10,6 +20,10 @@ from sklearn.model_selection import train_test_split
 import warnings
 
 name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+
+# Type the columns you want to delete in the detection phase
+delete_columns = ['MAC']
+
 
 """ Load the model from disk """
 def load_model(filename):
@@ -33,12 +47,15 @@ def predict_capture(dataset):
             to_model_columns=dataFrame.columns[1:19]
             dataFrame[to_model_columns] = dataFrame[to_model_columns].astype(int)
 
+            # We delete the columns that we do not want
+            dataFrame_aux = dataFrame.drop(delete_columns, axis=1)
+
             # Prediction
-            prediction = loaded_model.predict(dataFrame[dataFrame.columns[1:19]])
-            dataFrame['IF']=prediction
+            prediction = loaded_model.predict(dataFrame_aux)
+            dataFrame_aux['IF']=prediction
 
             # List of MACs with abnormal activity
-            macs_atacando = dataFrame.loc[dataFrame['IF']==-1]['MAC'].tolist()
+            macs_atacando = dataFrame.loc[dataFrame_aux['IF']==-1]['MAC'].tolist()
 
         except FileNotFoundError:
             msg = "Dataset does not exist or there was a problem in reading it".format(dataset)
@@ -71,10 +88,12 @@ def predict_if(cad, filename):
                 d[headers.split(";")[i]]=[int(cad.split(";")[i])]
         df = pd.DataFrame(data=d)
 
-        traff_dif = df.iloc[ : ,1:19]
+        traff_dif = df.drop(delete_columns, axis=1)
+        #traff_dif = df.iloc[ : ,1:19]
         try:
             # Resultado de la prediccion:
             prediction = loaded_model.predict(traff_dif)
+            print(f"Prediction taking into accout these columns: {(traff_dif.columns.tolist())}:")
             print(prediction)
         except:
             print("ERROR! The prediction could not made")
@@ -94,7 +113,7 @@ def predict_dataset_if(dataset, filename):
             dataFrame= dataFrame.fillna(0)
             to_model_columns=dataFrame.columns[1:19]
             dataFrame[to_model_columns] = dataFrame[to_model_columns].astype(int)
-            dataFrame_aux = dataFrame[dataFrame.columns[1:19]]
+            dataFrame_aux = dataFrame.drop(delete_columns, axis=1)
             prediction = loaded_model.predict(dataFrame_aux)
             count_normal = 0;
             count_anomaly = 0;
@@ -103,9 +122,11 @@ def predict_dataset_if(dataset, filename):
                     count_normal += 1
                 else:
                     count_anomaly += 1
+
+            print(f"Prediction taking into accout these columns: {(dataFrame_aux.columns.tolist())}")
             print("------------------------------------")
-            print(f"Cantidad de MACS con actividad Normal: {count_normal}")
-            print(f"Cantidad de MACs con actividad Anormal: {count_anomaly}")
+            print(f"Quantity of normal MAC activity: {count_normal}")
+            print(f"Quantity of abnormal MAC activity: {count_anomaly}")
             print("------------------------------------")
 
             # Imprimimos las anomalias detectadas en pantalla
