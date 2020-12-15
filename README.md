@@ -224,10 +224,14 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 4. You can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 #### Detection
-1. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network using the monitoring data each `POST` seconds! If you wish, you can set `GENERATE_DATASET` to 'no' because we do not need saving the data in a file (the model was generated in the previous phase). It is up to you! So, if the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`.  
-2. Furthermore, if the algorithm detects any abnormal activity, a network capture (.pcap file) will be saved in the `./bcast_ids/forensic` directory.
-3. If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not.
-4. Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow these steps:
+BCAST_IDS could detected anomalous detected in tow different ways:
+1. **By the Machine Learning algorithm**. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network using the monitoring data each `POST` seconds! If you wish, you can set `GENERATE_DATASET` to 'no' because we do not need saving the data in a file (the model was generated in the previous phase). It is up to you! So, if the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`.
+2. **A MAC address, which are not in EXCLUDE_MACS property of the config.txt file, and has asked for the MAC of the computer where is installed the BCAST_IDS software using ARP, IPv4 or IPv6 protocols.** 
+
+If the program detects any of the two previous circumstances, a network capture (.pcap file) will be saved in the `./bcast_ids/forensic` directory.
+
+If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not.
+Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow these steps:
    - Make sure you have the Telegram app downloaded on your smartphone and you are able to send and receive messages using this application.
    - Next, you need to make a bot, which is a third-party application that runs inside Telegram. In our case, the bot will be the sender of the message you receive when an anomaly is detected in the network. You can create a bot by talking to [BotFather](https://core.telegram.org/bots), which is a Telegram bot which allows to create and manage your own Telegram bots. 
    - You can type the /help command to view all the possibilities which you can do with BotFather. Since it is required to create a bot, write “/newbot” and follow the instructions that BotFather tells you.   
