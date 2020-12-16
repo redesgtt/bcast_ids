@@ -75,41 +75,39 @@ def ip_addr (c) :
     return d
 
 
-""" Devuelve un diccionario con la direccion IPv4, IPv6 y direccion MAC de la sonda (PC donde se encuentra instalado el BCAST_IDS)"""
-def info_sonda():
-    # Obtiene la direccion IPv4, IPv6 y MAC de la sonda u ordenador donde se encuentra instalado el programa de BCAST_IDS
-    if not os.path.isfile('./ipv4_ipv6_mac.tmp'):
-        s = "/sbin/ifconfig eth0 | grep -e ether -e inet | awk '{print $2}' > ipv4_ipv6_mac.tmp"
-        os.system(s)
-
-    dict_info_sonda = {
-        "ipv4": read_text('./ipv4_ipv6_mac.tmp').split('\n')[0],
-        "ipv6": read_text('./ipv4_ipv6_mac.tmp').split('\n')[1],
-        "mac": read_text('./ipv4_ipv6_mac.tmp').split('\n')[2]
-    }
-
-    return dict_info_sonda
-
-# Informacion de la sonda (IPV4, IPv6 y MAC)
-dict_info_sonda = info_sonda()
-
-
 """ Devuelve un diccionario con todos los valores del fichero config.txt """
 def getValuesConfig():
     configFile_value = dict()
     filename = 'config.txt'
     with open(filename) as f_obj:
         lines = f_obj.readlines()
-
     for line in lines:
         if not line.startswith( '#' ) and not line.startswith( '\n' ):
             text = line.rstrip().split("=")[0]
             configFile_value[text]=line.rstrip().split("=")[1]
-
     return configFile_value
 
 # Diccionario que almacena los valores del fichero config:
 configFile_value = getValuesConfig()
+
+
+""" Devuelve un diccionario con la direccion IPv4, IPv6 y direccion MAC de la sonda (PC donde se encuentra instalado el BCAST_IDS)"""
+def info_sonda():
+    eth = configFile_value.get('IFACE2')
+    # Obtiene la direccion IPv4, IPv6 y MAC de la sonda u ordenador donde se encuentra instalado el programa de BCAST_IDS
+    if not os.path.isfile('./ipv4_ipv6_mac.tmp'):
+        s = "/sbin/ifconfig " + eth + " | grep -e ether -e inet | awk '{print $2}' > ipv4_ipv6_mac.tmp"
+        os.system(s)
+    dict_info_sonda = {
+        "ipv4": read_text('./ipv4_ipv6_mac.tmp').split('\n')[0],
+        "ipv6": read_text('./ipv4_ipv6_mac.tmp').split('\n')[1],
+        "mac": read_text('./ipv4_ipv6_mac.tmp').split('\n')[2]
+    }
+    return dict_info_sonda
+
+# Informacion de la sonda (IPV4, IPv6 y MAC)
+dict_info_sonda = info_sonda()
+
 
 #...................................................................................
 
