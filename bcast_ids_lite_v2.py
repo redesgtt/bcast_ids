@@ -91,23 +91,14 @@ def getValuesConfig():
 configFile_value = getValuesConfig()
 
 
-""" Devuelve un diccionario con la direccion IPv4, IPv6 y direccion MAC de la sonda (PC donde se encuentra instalado el BCAST_IDS)"""
-def info_sonda():
+""" Devuelve la MAC de la eth de la sonda """
+def mac_eth_sonda():
     eth = configFile_value.get('IFACE2')
-    # Obtiene la direccion IPv4, IPv6 y MAC de la sonda u ordenador donde se encuentra instalado el programa de BCAST_IDS
-    if not os.path.isfile('./ipv4_ipv6_mac.tmp'):
-        s = "/sbin/ifconfig " + eth + " | grep -e ether -e inet | awk '{print $2}' > ipv4_ipv6_mac.tmp"
-        os.system(s)
-    dict_info_sonda = {
-        "ipv4": read_text('./ipv4_ipv6_mac.tmp').split('\n')[0],
-        "ipv6": read_text('./ipv4_ipv6_mac.tmp').split('\n')[1],
-        "mac": read_text('./ipv4_ipv6_mac.tmp').split('\n')[2]
-    }
-    return dict_info_sonda
+    mac_eth = os.popen("/sbin/ifconfig " + eth + " | grep -e ether | awk '{print $2}'").read().rstrip("\n").replace(':','')
+    return mac_eth
 
-# Informacion de la sonda (IPV4, IPv6 y MAC)
-dict_info_sonda = info_sonda()
-
+# Almacenamos la MAC de la interfaz IFACE2 de la sonda en una variable
+mac_sonda = mac_eth_sonda()
 
 #...................................................................................
 
@@ -317,8 +308,7 @@ def count_packets(*args):
     mac_src = args[3]
     mac_dst = args[4]
     eth_type = args[5]
-    mac_sonda = args[6]
-    proto = args[7]
+    proto = args[6]
 
     attributes[0] += 1
 
@@ -433,13 +423,11 @@ def count_packets(*args):
 """Lee el PCAP y contabiliza el numero de paquetes para generar el DATATSET:
 Formato: {mac : 'MACs, UCAST, MCAST, BCAST, ARPrq, ARPpb, ARPan, ARPgr, LIPF, IP_ICMP, IP_UDP, IP_TCP, IP_RESTO, IP6, RESTO, ARP_noIP, SSDP, ICMPv6'} """
 def mac_lines(pcap):
-    excluye_macs = configFile_value.get('EXCLUDE_MACS').split(",")
+    # Obtenemos las direcciones MACs del fichero config con el formato apropiado
+    excluye_macs = configFile_value.get('EXCLUDE_MACS').replace(':','').lower().split(',')
+
     num_attributes = 18
     attributes = [0] * num_attributes # Inicializamos la lista de valores de cada MAC a 0
-    #print(attributes)
-
-    # Propiedades que utilizaremos para comprobar si una direccion MAC ha preguntado por la sonda
-    mac_sonda = dict_info_sonda.get("mac").replace(':','')
     proto = set()
 
     for ts, payload in pcap:
@@ -450,12 +438,12 @@ def mac_lines(pcap):
         # Contabilizamos la cantidad de paquetes para cada direccion MAC
         if mac_src in mac_line:
             attributes = mac_line[mac_src]
-            count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type,mac_sonda,proto)
+            count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type,proto)
         else:
             if mac_src not in excluye_macs and mac_src in ipm_subred:
                 attributes = [0] * num_attributes
                 mac_line[mac_src] = attributes
-                count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type,mac_sonda,proto)
+                count_packets(ts,payload,attributes,mac_src,mac_dst,eth_type,proto)
 
     # IPF. Contabiliza el num de asociaciones IP (MACs que han preguntado por una direccion IP que existe)
     if ipf:
@@ -486,7 +474,6 @@ def mac_lines(pcap):
     # Imprimimos las lineas para generar el DATASET
     if configFile_value.get('GENERATE_DATASET') == 'yes':
         print_mac_line()
-
 
 
 """Generamos las lineas del dataset con formato. Ordenamos de mas actividad a menor actividad."""
@@ -581,8 +568,6 @@ def alerta_telegram(macs_atacando):
     header = "MAC;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP;SSDP;ICMPv6"
     # Obtenemos el chat_id:
     chats_id = configFile_value.get('CHAT_ID').split(",")
-    # Obtenemos la MAC de la sonda
-    mac_sonda = dict_info_sonda.get("mac").replace(':','')
 
     AI_applied = False
     # Damos formato al mensaje para enviarlo por Telegram al chat_id especificado en el config
@@ -612,7 +597,7 @@ def alerta_telegram(macs_atacando):
         else:
             message_to_telegram = "Abnormal activity detected!\n\n"
             for mac_atacando in macs_atacando:
-                message_to_telegram += f"Source MAC address {''.join(map(str, mac_atacando))} has generated {'/'.join(map(str,macAccess_protocol[''.join(map(str, mac_atacando))]))} packets towards the BCAST_IDS MAC address destination ({mac_sonda})\n\n"
+                message_to_telegram += f"Source MAC address {''.join(map(str, mac_atacando))} has generated {'/'.join(map(str,macAccess_protocol[''.join(map(str, mac_atacando))]))} packets towards BCAST_IDS MAC address destination ({mac_sonda})\n\n"
             message_to_telegram += f"The activity was: \n{cad}"
 
         # Enviamos la alerta por Telegram al chat_id o los chat_ids indicados en el fichero config.txt
@@ -629,7 +614,6 @@ def alerta_telegram(macs_atacando):
 def send_email_attack(macs_atacando):
     global dia, hora
     receivers_email = configFile_value.get('RECEIVERS_EMAIL').split(",")
-    mac_sonda = dict_info_sonda.get("mac").replace(':','')
 
     AI_applied = False
     # Inicializamos el texto a mostrar por correo
