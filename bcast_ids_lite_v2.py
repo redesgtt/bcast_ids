@@ -516,8 +516,7 @@ def run_IA():
             aux.extend(value)
             to_dataFrame.append(aux)
 
-        macAccess_protocol = dict()
-        # Tomamos la decision si aplicamos IA o se ha preguntado por la MAC origen de la sonda
+        # Tomamos la decision si aplicamos IA o se ha preguntado por la MAC origen de la sonda. Si la lista de macAccess_protocol esta vacia querra decir que no se ha preguntado por la sonda. Aplicamos IA.
         if not macAccess_protocol:
             # ISOLATION FOREST. Obtiene las direcciones MAC anomalas de la captura de 10 segundos en curso
             macs_atacando = predict_capture(to_dataFrame)
