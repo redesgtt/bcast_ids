@@ -23,7 +23,7 @@ from generate_outliers import outliers_to_dataframe
 
 dia = datetime.today().strftime('%d/%m/%Y')
 hora = datetime.today().strftime('%H:%M')
-name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARP','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
 
 # Type the columns you want to delete in the training phase
 delete_columns = ['MAC']

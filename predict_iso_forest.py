@@ -19,7 +19,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
 import warnings
 
-name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARP','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
 
 # Type the columns you want to delete in the detection phase
 delete_columns = ['MAC']
@@ -67,11 +67,9 @@ def predict_capture(dataset):
     else:
         return macs_atacando
 
-
 def predict_if(cad, filename):
-
     # Cabecera:
-    headers = "MAC;NUM_MACS;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6"
+    headers = "MAC;NUM_MACS;UCAST;MCAST;BCAST;ARP;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6"
 
     if filename == None:
         loaded_model = load_model("./model_iso_forest.bin")
@@ -99,6 +97,7 @@ def predict_if(cad, filename):
             print("ERROR! The prediction could not made")
     else:
         print(f"ERROR! Model not found in the current directory {os.getcwd()}")
+
 
 def predict_dataset_if(dataset, filename):
     global name_columns

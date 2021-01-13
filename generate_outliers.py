@@ -19,7 +19,8 @@ import os
 
 # Diccionario mac_maxAct
 mac_maxAct = dict()
-name_columns = ['MAC','NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+#name_columns = ['MAC','NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARPrq','ARPpb','ARPan','ARPgr','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
+name_columns = ['MAC','NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARP','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
 
 """ We create the dataframe from a .csv file """
 def generaDataFrame(dataset):
@@ -97,8 +98,8 @@ def generateOutliers(num):
     percentaje = 0.020 # Variacion
     # PORT SCANNING:
     for i in range(num):
-        l = [0] * 18
-        l[0] = randint(240, 800)
+        l = [0] * 15
+        l[0] = randint(180, 800)
         l[1] = 0
         aux = 0
         aux = randint(0, 50)
@@ -112,25 +113,25 @@ def generateOutliers(num):
             l[4] = l[0]
         temp = randint(0, 10)
         if temp <= 1:
-            l[8] = randint(20, 80)
+            l[5] = randint(20, 80)
         else:
-            l[8] = randint(0, 8)
-        l[9] = randint(0, 1)
-        l[10] = randint(0, 20)
-        l[12] = randint(0, 5)
-        l[13] = randint(0, 8)
-        l[14] = randint(0, 2)
-        l[15] = randint(170, 254) - l[8]
+            l[5] = randint(0, 8)
+        l[6] = randint(0, 1)
+        l[7] = randint(0, 20)
+        l[9] = randint(0, 5)
+        l[10] = randint(0, 8)
+        l[11] = randint(0, 2)
+        l[12] = randint(170, 254) - l[5]
         ssdp = randint(0, 8)
-        if ssdp <= l[10]:
-            l[16]= ssdp
+        if ssdp <= l[7]:
+            l[13]= ssdp
         else:
-            l[16] = 0
+            l[13] = 0
         icmpv6 = randint(0, 3)
         if icmpv6 <= l[13]:
-            l[17] = icmpv6
+            l[14] = icmpv6
         else:
-            l[17] = 0
+            l[14] = 0
         l = [f"auto_outlier{i}"] + l
         lista_actividad.append(l)
     return lista_actividad

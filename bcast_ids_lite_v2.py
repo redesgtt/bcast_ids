@@ -332,20 +332,13 @@ def count_packets(*args):
         ip_src = ip_addr(payload[28:32])
         ip_dst = ip_addr(payload[38:42])
 
-        # COMPLETAMOS LOS VALORES DEL DATASET
+        # ARP
+        ## ARPpb + ARPan + ARPrq
         if arp_opcode == '0001' and mac_dst == 'ffffffffffff':
-            if ip_src == "0.0.0.0": # ARPpb
-                #print (mac_src,mac_dst,eth_type,arp_opcode,ip_src,ip_dst)
-                attributes[5] += 1
-            elif ip_src == ip_dst:  # ARPan
-                #print (mac_src,mac_dst,eth_type,arp_opcode,ip_src,ip_dst)
-                attributes[6] += 1
-            else:
-                #print (mac_src,mac_dst,eth_type,arp_opcode,ip_src,ip_dst)
-                attributes[4] += 1          # ARPrq
-                #print(mac_src, ip_src)
+            attributes[4] += 1
+        ## ARPgr
         elif arp_opcode == '0002' and mac_dst == 'ffffffffffff':
-            attributes[7] += 1          # ARPgr
+            attributes[4] += 1
 
         # Comprobamos si la MAC ha pregutado por la sonda usando el protocolo ARP
         if mac_dst == mac_sonda:
@@ -365,20 +358,20 @@ def count_packets(*args):
 
         #UDP=17
         if protocol == 17:
-            attributes[10]+=1
+            attributes[7]+=1
 
             #SSDP
             if dst_port == 1900 and ip_dst == '239.255.255.250':
-                attributes[16]+=1
+                attributes[13]+=1
 
         # TCP=6
-        elif protocol == 6: attributes[11]+=1
+        elif protocol == 6: attributes[8]+=1
 
         # ICMP=1
-        elif protocol == 1: attributes[9]+=1
+        elif protocol == 1: attributes[6]+=1
 
         # IP_RESTO
-        else: attributes[12]+=1
+        else: attributes[9]+=1
 
         # Comprobamos si la MAC ha preguntado por la sonda usando el protocolo IPv4
         if mac_dst == mac_sonda:
@@ -392,11 +385,11 @@ def count_packets(*args):
     # IPv6
     elif eth_type == '86dd':
         # Contabilizamos paquetes IPv6
-        attributes[13]+=1
+        attributes[10]+=1
         # Contabilizamos paquetes ICMPv6 (icmpv6_opcode == 00):
         icmpv6_opcode = binascii.hexlify(payload[55:56]).decode()
         if icmpv6_opcode == '00':
-            attributes[17]+=1
+            attributes[14]+=1
 
         # Comprobamos si la MAC ha preguntado por la sonda usando el protocolo IPv6
         if mac_dst == mac_sonda:
@@ -409,7 +402,7 @@ def count_packets(*args):
 
     # RESTO
     else:
-        attributes[14]+=1
+        attributes[11]+=1
         # Comprobamos si la MAC ha preguntado por la sonda usando otro protocolo
         if mac_dst == mac_sonda:
             #print(f"La MAC {mac_src} ha preguntado por la sonda {mac_dst} - {eth_type}")
@@ -426,7 +419,7 @@ def mac_lines(pcap):
     # Obtenemos las direcciones MACs del fichero config con el formato apropiado
     excluye_macs = configFile_value.get('EXCLUDE_MACS').replace(':','').lower().split(',')
 
-    num_attributes = 18
+    num_attributes = 15
     attributes = [0] * num_attributes # Inicializamos la lista de valores de cada MAC a 0
     proto = set()
 
@@ -462,14 +455,14 @@ def mac_lines(pcap):
                         else:
                             mac_ipf[mac_s].add(ip_dst_ipf)
                         l = mac_line[mac_s]
-                        l[8] += 1
+                        l[5] += 1
 
     # ARP_nIP. Contabilizamos la cantidad de direcciones IPs que una MAC ha preguntado y que no existen en el fich ips-week.json
     if mac_nip:
         for mac, values_nip in mac_nip.items():
             if mac in mac_line:
                 l = mac_line[mac]
-                l[15] = len(values_nip)
+                l[12] = len(values_nip)
 
     # Imprimimos las lineas para generar el DATASET
     if configFile_value.get('GENERATE_DATASET') == 'yes':
@@ -520,6 +513,7 @@ def run_IA():
         if not macAccess_protocol:
             # ISOLATION FOREST. Obtiene las direcciones MAC anomalas de la captura de 10 segundos en curso
             macs_atacando = predict_capture(to_dataFrame)
+            AI_applied = True
         else:
             macs_atacando= list(macAccess_protocol.keys())
 
@@ -539,7 +533,7 @@ def run_IA():
 
             # Se registra en el fichero de log macs_abnormal_act.log las MACs que han cometido alguna anomalia y su actividad:
             for mac_atacando in macs_atacando:
-                save_text("macs_abnormal_act.log", f"{dia} {hora} - AI applied: {AI_applied} MAC: {mac_atacando} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
+                save_text("macs_abnormal_act.log", f"{dia} {hora} - MAC: {mac_atacando} - AI applied: {AI_applied} - Activity: {';'.join(map(str,mac_line[mac_atacando]))}\n", "a")
     else:
         if configFile_value.get('AUTOMATED_TRAINING')=='yes':
             if os.path.isfile('./time.tmp'):
@@ -564,8 +558,9 @@ def run_IA():
 
 
 def alerta_telegram(macs_atacando):
-    header = "MAC;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP;SSDP;ICMPv6"
+    #header = "MAC;MACs;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP;SSDP;ICMPv6"
     # Obtenemos el chat_id:
+    header = "MAC;MACs;UCAST;MCAST;BCAST;ARP;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;RESTO;ARP_noIP;SSDP;ICMPv6"
     chats_id = configFile_value.get('CHAT_ID').split(",")
 
     AI_applied = False
@@ -633,7 +628,8 @@ def send_email_attack(macs_atacando):
     ## Actividad de la MAC
     ## Direcciones IP que ha preguntado y NO existen (valores de ARP_nIP)
     ## Direcciones IP que una MAC ha preguntado y SI existen (valores de IPF)
-    registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6\n"
+    #registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARPrq;ARPpb;ARPan;ARPgr;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6\n"
+    registro_mac = "MAC;NUM_MAC;UCAST;MCAST;BCAST;ARP;IPF;IP_ICMP;IP_UDP;IP_TCP;IP_RESTO;IP6;ETH_RESTO;ARP_noIP;SSDP;ICMPv6\n"
     for mac_atacando in macs_atacando:
         if len(macs_atacando) == 1:
             if mac_atacando in macAccess_protocol:
