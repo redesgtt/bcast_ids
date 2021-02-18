@@ -84,10 +84,7 @@ The training dataset is collected from a real-world connected environment. At th
 | UCAST  | Total UNICAST traffic generated from a specific MAC address |
 | MCAST  | Total MULTICAST traffic generated from a specific MAC address  |
 | BCAST  | Total BROADCAST traffic generated from a specific MAC address  |
-| ARPrq  | Total ARP Request traffic generated from a specific MAC address  |
-| ARPpb  | Total ARP Probe traffic generated from a specific MAC address  |
-| ARPan  | Total ARP Announcement traffic generated from a specific MAC address  |
-| ARPgr  | Total ARP Gratitous traffic generated from a specific MAC address  |
+| ARP  | Total ARP Request, ARP Probe, ARP Announcement and ARP Gratitous traffic generated from a specific MAC address  |
 | IPF  | Total ARP Request generated from a specific MAC address to an IP address which exists   |
 | IP_ICMP  | Total IP ICMP traffic generated from a specific MAC address  |
 | IP_UDP  | Total IP UDP traffic generated from a specific MAC address  |
