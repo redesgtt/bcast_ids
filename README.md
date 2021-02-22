@@ -224,9 +224,7 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 #### Detection
 **BCAST_IDS could detect anomalous network behaviour in two different ways:**
 1. **By the Machine Learning algorithm**. If the model has saved successfully and you have checked that the outliers detected by the algorithm are appropiate in the training phase, BCAST_IDS should predict anomalies on your network using the monitoring data each `POST` seconds! If you wish, you can set `GENERATE_DATASET` to 'no' because we do not need saving the data in a file (the model was generated in the previous phase). It is up to you! So, if the algorithm detects any abnormal activity, it will be registered at `macs_abnormal_act.log`.
-2. **By network packet patterns.** 
-   2.1 A MAC address, which are not included in EXCLUDE_MACS property of the config.txt file,  has asked for the MAC of the computer where is installed the BCAST_IDS, using ARP, IPv4 or IPv6 protocols.
-   2.2 The computer where is installed the BCAST_IDs has generated ICMPv6 Parameter Problem message. 
+2. **By network packet patterns.** A MAC address, which are not included in EXCLUDE_MACS property of the config.txt file,  has asked for the MAC of the computer where is installed the BCAST_IDS, using ARP, IPv4 or IPv6 protocols or if the computer where is installed the BCAST_IDs has generated ICMPv6 Parameter Problem message. 
 
 If the program detects any of the two previous circumstances, a network capture (.pcap file) will be saved in the `./bcast_ids/forensic` directory.
 
