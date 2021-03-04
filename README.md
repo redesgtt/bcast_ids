@@ -38,7 +38,7 @@ The following picture represents an overview of the BCAST_IDS architecture:
 ![alt text](https://user-images.githubusercontent.com/69505347/100358073-e75c2200-2ff5-11eb-829d-a3e66906109b.png)
 
 The system will also generate the following files:
-- **JSON files: (time is represented as a integer number expressed in seconds since the epoch, in UTC)**
+- **JSON files (time is represented as a integer number expressed in seconds since the epoch, in UTC)**
 
 | File name  | Description |
 | ------------- | ------------- |
@@ -109,7 +109,7 @@ dpkt psutil numpy pandas sklearn
 ```
 
 ### Configuration file
-You can modify the `config.txt` file and fill up the variables on your own. **Time is always represented in seconds**:
+You can modify the `config.txt` file and fill up the variables on your own:
 ```
 #####################################################################################
 #
