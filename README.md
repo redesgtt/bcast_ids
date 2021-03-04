@@ -228,7 +228,7 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 
 If the program detects any of the two previous circumstances, a network capture (.pcap file) will be saved in the `./bcast_ids/forensic` directory.
 
-If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not. Moreover, you can use the script `./send_email.py` to check if you have successfully configured the email properties of the config file (`MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL`) and send a test message.
+If you want to receive an email when an anomaly is detected, change `SEND_EMAIL` property to `yes` and fill up the variables `MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL` on your own. You can check the log file `email_messages.log` in order to visualize if an email was sent successfully or not. Moreover, you can execute the script `./send_email.py` to check if you have configured the email properties of the config file (`MAIL_SERVER`, `PORT_MAIL_SERVER`, `SENDER_EMAIL` and `RECEIVERS_EMAIL`) successfully and send a test message.
 
 Last but not least, if you want to receive an alert when an anomaly is detected through **Telegram**, you have to follow these steps:
    - Make sure you have the Telegram app downloaded on your smartphone and you are able to send and receive messages using this application.
