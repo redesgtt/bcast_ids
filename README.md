@@ -81,21 +81,21 @@ The training dataset is collected from a real-world connected environment. At th
 | Feature  | Description |
 | ------------- | ------------- |
 | MAC  | MAC address  |
-| num_MAC  | Total network packets generated from a specific MAC address |
-| UCAST  | Total UNICAST traffic generated from a specific MAC address |
-| MCAST  | Total MULTICAST traffic generated from a specific MAC address  |
-| BCAST  | Total BROADCAST traffic generated from a specific MAC address  |
-| ARP  | Total ARP Request, ARP Probe, ARP Announcement and ARP Gratitous traffic generated from a specific MAC address  |
-| IPF  | Total ARP Request generated from a specific MAC address to an IP address which exists   |
-| IP_ICMP  | Total IP ICMP traffic generated from a specific MAC address  |
-| IP_UDP  | Total IP UDP traffic generated from a specific MAC address  |
-| IP_TCP  | Total IP TCP traffic generated from a specific MAC address  |
+| num_MAC  | Total amount of network packets generated from a specific MAC address |
+| UCAST  | Total amount of UNICAST traffic generated from a specific MAC address |
+| MCAST  | Total amount of MULTICAST traffic generated from a specific MAC address  |
+| BCAST  | Total amount of BROADCAST traffic generated from a specific MAC address  |
+| ARP  | Total amount of ARP Request, ARP Probe, ARP Announcement and ARP Gratitous traffic generated from a specific MAC address  |
+| IPF  | Total amount of ARP Request generated from a specific MAC address to an IP address which exists   |
+| IP_ICMP  | Total amount of IP ICMP traffic generated from a specific MAC address  |
+| IP_UDP  | Total amount of IP UDP traffic generated from a specific MAC address  |
+| IP_TCP  | Total amount of IP TCP traffic generated from a specific MAC address  |
 | IP_RESTO  | Other traffic generated from a specific MAC address  |
-| IPv6  | Total IPv6 traffic generated from a specific MAC address  |
-| ETH_RESTO  | Total ETHERNET traffic generated from a specific MAC address  |
-| ARP_noIP  | Total ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
-| SSDP  | Total SSDP traffic generated from a specific MAC address   |
-| ICMPv6  | Total ICMPv6s traffic generated from a specific MAC address   |
+| IPv6  | Total amount of IPv6 traffic generated from a specific MAC address  |
+| ETH_RESTO  | Total amount of ETHERNET traffic generated from a specific MAC address  |
+| ARP_noIP  | Total amount of ARP Request generated from a specific MAC address to an IP address which does NOT exist   |
+| SSDP  | Total amount of SSDP traffic generated from a specific MAC address   |
+| ICMPv6  | Total amount of ICMPv6s traffic generated from a specific MAC address   |
 
 Once the features were determined to fed the Isolation Forest algorithm later on, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset should cover distinct attack types and attack-free circumstances. 
 
@@ -240,7 +240,9 @@ Last but not least, if you want to receive an alert when an anomaly is detected 
    - Finally, you have to copy your chat_id and paste it into the `CHAT_ID` property and set the `TELEGRAM_INTEGRATION` to `yes` in the config.txt. At this time, the system will send an alert when an anomaly is detected to your Telegram account using the bot you have created. The log results will be registered at `telegram_messages.log`.
 
 #### Dealing with false positives
-If you observe that the BCAST_iDS generates lots of false positives in the prediction through the Isolation Forest algorithm, you can readjust the model using the script  `./train_iso_forest.py`. As we explained above, this script extracts abnormal patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, which is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Then, analyze the outliers given by the algorithm (they will pop up at the screen after executing the training script). Afterwards, a model will be generated with the name `model_iso_forest.bin` in the main project directory. Make some tests with the script `./predict_iso_forest.py` in order to verify the effectiveness of the Isolation Forest algorithm and make sure that there are less false positives than before.
+1. If you observe that the BCAST_iDS generates lots of false positives in the prediction through the Isolation Forest algorithm, you can readjust the model using the script  `./train_iso_forest.py`. As we explained above, this script extracts abnormal patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, which is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. 
+2. Then, analyze the outliers given by the algorithm (they will pop up at the screen after executing the training script). Afterwards, a model will be generated with the name `model_iso_forest.bin` in the main project directory. 
+3. Make some tests with the script `./predict_iso_forest.py` in order to verify the effectiveness of the Isolation Forest algorithm and make sure that there are less false positives than before.
 
 ## References
 1. Buczak AL, Guven E (2016) A survey of data mining and machine learning methods for cyber security intrusion detection. IEEE Commun Surv Tutor 18(2):1153–1176. https://doi.org/10.1109/COMST.2015.2494502
