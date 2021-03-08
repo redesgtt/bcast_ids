@@ -16,7 +16,8 @@
         * [Training](#training)
           * [Automated training](#automated-training)
           * [Manual training](#manual-training)
-        * [Detection](#detection)  
+        * [Detection](#detection)
+        * [Dealing with false positives](#dealing-with-false-positives)
    * [References](#references)
 
 ## Abstract
@@ -216,7 +217,7 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 3. Additionally, you can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 ##### Manual training
-1. You can use the script `./train_iso_forest.py` manually to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm (the will pop up at the screen after executing the training script).
+1. You can use the script `./train_iso_forest.py` manually to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm (they will pop up at the screen after executing the training script).
 2. Soon afterward, a model will be generated with the name `model_iso_forest.bin`. Note that this model is located in the main project directory:  `./bcast_ids/model_iso_forest.bin`.
 3. Make some tests with the script `./predict_iso_forest.py` and verify the effectiveness of the Isolation Forest algorithm.
 4. You can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
@@ -239,6 +240,11 @@ Last but not least, if you want to receive an alert when an anomaly is detected 
    - Then, execute the script `./telegram_integration.py -i` to obtain your chat_id.
    - You can try to send a message using the option `./telegram_integration -t [CHAT_ID]` and see if you receive an alert from your bot like this: *“Congrats! You have configured successfully the integration with Telegram!”*
    - Finally, you have to copy your chat_id and paste it into the `CHAT_ID` property and set the `TELEGRAM_INTEGRATION` to `yes` in the config.txt. At this time, the system will send an alert when an anomaly is detected to your Telegram account using the bot you have created. The log results will be registered at `telegram_messages.log`.
+
+#### Dealing with false positives
+If you observe that the BCAST_iDS generates lots of false positives in the prediction through the Isolation Forest algorithm, you can readjust the model using the script  `./train_iso_forest.py`. As we explained above, this script extract abnormal patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, which is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Then, analyze the outliers given by the algorithm (they will pop up at the screen after executing the training script).
+2. Afterwards, a model will be generated with the name `model_iso_forest.bin` in the main project directory.
+3. Make some tests with the script `./predict_iso_forest.py` in order to verify the effectiveness of the Isolation Forest algorithm and make sure that there are less false positives than before.
 
 ## References
 1. Buczak AL, Guven E (2016) A survey of data mining and machine learning methods for cyber security intrusion detection. IEEE Commun Surv Tutor 18(2):1153–1176. https://doi.org/10.1109/COMST.2015.2494502
