@@ -97,7 +97,7 @@ The training dataset is collected from a real-world connected environment. At th
 | SSDP  | Total amount of SSDP traffic generated from a specific MAC address   |
 | ICMPv6  | Total amount of ICMPv6s traffic generated from a specific MAC address   |
 
-Once the features were determined to fed the Isolation Forest algorithm later on, the next step is to generate the data. This is typically implemented in stages based first on an attack-free netwok and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset should cover distinct attack types and attack-free circumstances. 
+Once the features were determined to fed the Isolation Forest algorithm later on, the next step is to generate the data. This is typically implemented in stages based first on an attack-free network and then a number of attacks until all the classes that need to be considered are fully covered by the dataset. The final dataset should cover distinct attack types and attack-free circumstances. 
 
 ## Running the BCAST_IDS
 ### Hardware Prerequisites
