@@ -76,7 +76,7 @@ The system will also generate the following files:
 | **time.tmp**  | Temporary file that BCAST_IDS uses in order to make the automated training  |
 
 ### Dataset Generation
-The training dataset is collected from a real-world connected environment. At this point, the main features have to be identified. There are a whole bunch of features that can be monitored by networking tools for network analysis over the network, but some of them could be redundant. So, we have selected nineteen features and are listed below:
+The training dataset is collected from a real-world connected environment. At this point, the main features have to be identified. There are a whole bunch of features that can be monitored by networking tools for network analysis over the network, but some of them could be redundant. So, we have selected sixteen features and are listed below:
 
 | Feature  | Description |
 | ------------- | ------------- |
