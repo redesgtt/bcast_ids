@@ -214,13 +214,11 @@ Wait for the requirements to download, it may take a while. Once they are downlo
 ##### Automated training
 1. If there is no a Machine Learning model in the bcast_ids directory, the system can extract data patterns automatically from the data collected in `dataset.csv` so far bear in mind the countdown specified in `TIME_AUTOMATED_TRAINING`. Also, make sure `AUTOMATED_TRAINING` is set to 'yes'. Remember you can adjust the contamination parameter of the Isolation Forest algorithm in the config file (it is set to 'auto' by default).
 2. Once the countdown is over and if everything went as expected, a model will be created in the bcast_ids folder with the name `model_iso_forest.bin` and the results could be checked at the file `training_messages.log`. Otherwise, an message error will appear at the aforementioned log file.
-3. Additionally, you can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 ##### Manual training
 1. You can use the script `./train_iso_forest.py` manually to extract patterns from the data collected in the file `dataset.csv`. Feel free to change the contamination parameter `-c`, that is the proportion of outliers in the dataset. Note that this value must be between 0 and 0.5. Analyze the outliers given by the algorithm (they will pop up at the screen after executing the training script).
 2. Soon afterward, a model will be generated with the name `model_iso_forest.bin`. Note that this model is located in the main project directory:  `./bcast_ids/model_iso_forest.bin`.
 3. Make some tests with the script `./predict_iso_forest.py` and verify the effectiveness of the Isolation Forest algorithm.
-4. You can use the notebook `Notebook - BCAST_IDS Lite Version.ipynb` in order to perform some visualizations of the data you are collected and the abnormal points in a three-dimensional space. 
 
 #### Detection
 **BCAST_IDS could detect anomalous network behaviour in two different ways:**
