@@ -44,29 +44,22 @@ def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
             df_aux = df.drop(delete_columns, axis=1)
 
             if c == 'auto':
-                #df_aux = df_aux.drop(['MAC'],axis=1)
                 c = df_aux[df_aux > 40 ].count()['ARP_noIP'] / len(df_aux.axes[0])
                 print("Calculation of the contamination parameter = num ARP_noIP columns largest than 40 / total rows in the dataset")
                 print(f"Contamination: {df_aux[df_aux > 40 ].count()['ARP_noIP']} / {len(df_aux.axes[0])} = {float(c)}")
                 classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
             else:
-                #df_aux = df_aux.drop(['MAC'],axis=1)
                 classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
 
             print(f"Training taking into accout these columns: {(df_aux.columns.tolist())}")
-            #print(df_aux)
+
             # Trainning and prediction of the results
             pred = classifier.fit_predict(df_aux)
 
             # Print the outliers detected
-            outliers_aux=df_aux.loc[pred==-1]
             outliers=df.loc[pred==-1]
             print("\t\nOUTLIERS:")
-
-            #print("All the activity")
-            print(outliers)
-            #print("\nActivity bear in mind by the algorithm")
-            #print(outliers_aux)
+            print(outliers.to_string())
 
             # Count normal and abnormal points:
             print("\t\nCOUNT: (1 actividad normal / -1 anomalias)")
@@ -150,7 +143,6 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
                 f"\t\t   RESULTS: {len(df_outliers.axes[0])} anomalies generated / {len(df.loc[pred==-1].axes[0])} anomalies detected = {len(df_outliers.axes[0])/len(df.loc[pred==-1].axes[0]) * 100} % accuracy \n"
                 f"The anomalies detected were: \n {df.loc[pred==-1].to_string()} \n\n"
                 )
-                #print(message)
             # GENERATE OUTLIERS set to 'no'
             else:
                 # Show the results:
@@ -158,8 +150,6 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
                 f"\t\t   RESULTS: {len(df.loc[pred==-1].axes[0])} anomalies detected in the first {len(df.axes[0])} rows of the {dataset} at the time of automated training.\n"
                 f"The anomalies detected were: \n {df.loc[pred==-1].to_string()} \n\n"
                 )
-                #print(message)
-
         else:
             message = f"{dia} {hora} - ERROR! Dataset is empty. Automated training was not successful. Model was NOT created. \n"
             train_successful = False
@@ -167,13 +157,12 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
         message = f"{dia} {hora} - ERROR! Exception captured: {e}. Automated training was not successful. Model was NOT created. \n"
         train_successful = False
     finally:
-        #return train_successful,c
         return message
 
 if __name__ == '__main__':
     text_help= "Script to train the Isolation Forest algorithm on a dataset. Examples:"
-    text_help += "\n\t./train_iso_forest.py -d dataset22.csv"
-    text_help += "\n\t./train_iso_forest.py -d dataset22.csv -c 0.0002456"
+    text_help += "\n\t./train_iso_forest.py -d dataset.csv"
+    text_help += "\n\t./train_iso_forest.py -d dataset.csv -c 0.0002456"
     text_help += "\nOUTPUT"
     text_help += "\n\t[+] model_iso_forest.bin -> trained ML model \n\n"
 

@@ -87,7 +87,6 @@ def predict_if(cad, filename):
         df = pd.DataFrame(data=d)
 
         traff_dif = df.drop(delete_columns, axis=1)
-        #traff_dif = df.iloc[ : ,1:19]
         try:
             # Resultado de la prediccion:
             prediction = loaded_model.predict(traff_dif)
@@ -130,8 +129,8 @@ def predict_dataset_if(dataset, filename):
 
             # Imprimimos las anomalias detectadas en pantalla
             outliers=dataFrame.loc[prediction==-1]
-            print("\t\nANOMALIAS:")
-            print(outliers)
+            print("\t\nANOMALIES:")
+            print(outliers.to_string())
 
         except FileNotFoundError:
             msg = "Dataset does not exist or there were a problem in reading the columns {0}.".format(dataset)
@@ -141,10 +140,10 @@ def predict_dataset_if(dataset, filename):
 
 if __name__ == '__main__':
     text_help= "Script to predict the activity of a MAC address or dataset using the Isolation Forest algorithm"
-    text_help += "\n\t./predict_iso_forest.py -s \"000fxxxxxxx;257;1;5;251;251;0;0;0;5;0;0;0;1;5;0;246;0;5\""
-    text_help += "\n\t./predict_iso_forest.py -s \"000fxxxxxxx;257;1;5;251;251;0;0;0;5;0;0;0;1;5;0;246;0;5\" -m model_iso_forest.bin"
-    text_help += "\n\t./predict_iso_forest.py -d dataset30.csv"
-    text_help += "\n\t./predict_iso_forest.py -d dataset30.csv -m model_iso_forest.bin"
+    text_help += "\n\t./predict_iso_forest.py -s \"MAC_ADDRESS;257;1;5;251;251;0;0;0;5;0;0;0;1;5;0;246;0;5\""
+    text_help += "\n\t./predict_iso_forest.py -s \"MAC_ADDRESS;257;1;5;251;251;0;0;0;5;0;0;0;1;5;0;246;0;5\" -m model_iso_forest.bin"
+    text_help += "\n\t./predict_iso_forest.py -d dataset.csv"
+    text_help += "\n\t./predict_iso_forest.py -d dataset.csv -m model_iso_forest.bin"
     text_help += "\nSALIDA"
     text_help += "\n\t[+]  1 -> normal activity \n"
     text_help += "\t[+] -1 -> abnormal activity \n\n"
