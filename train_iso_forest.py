@@ -26,8 +26,7 @@ hora = datetime.today().strftime('%H:%M')
 name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARP','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
 
 # Type the columns you want to delete in the training phase
-delete_columns = ['MAC']c
-
+delete_columns = ['MAC']
 
 """ To train the Isolation Forest algorithm manually """
 def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
