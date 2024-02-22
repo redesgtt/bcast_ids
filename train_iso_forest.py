@@ -122,8 +122,8 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
                     # In this section, we consider an anomaly if a row has the ARP_noIP value greater than 40
                     num_anomalies_in_dataset = df_aux[df_aux > 40 ].count()['ARP_noIP']
                     if num_anomalies_in_dataset > 0:
-                        new_c = num_anomalies_in_dataset / len(df.axes[0])
-                        classifier = IsolationForest(bootstrap=False, contamination=float(new_c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
+                        c = num_anomalies_in_dataset / len(df.axes[0])
+                        classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
                     else:
                         classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
                 else:
@@ -178,12 +178,12 @@ if __name__ == '__main__':
         if contamination != None:
             try:
                 if float(contamination) > float(0.5) or float(contamination) < 0:
-                    print("\t\nERROR! The CONTAMINATION parameter must be in the range [0, 0.5]\n")
+                    print("\t\nERROR! The CONTAMINATION parameter must be in the range (0, 0.5]\n")
                 else:
                     print(f'\nTraining the model with contamination {contamination} \n')
                     train_dataset(file, float(contamination))
             except:
-                print("ERROR! Please enter a valid contamination number. Remember that it has to be in the range [0, 0.5] or 'auto'")
+                print("ERROR! Please enter a valid contamination number. Remember that it has to be in the range (0, 0.5] or 'auto'")
         else:
             contamination = 'auto'
             print(f'\nTraining the model with contamination {contamination}. \n')
