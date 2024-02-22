@@ -26,7 +26,7 @@ hora = datetime.today().strftime('%H:%M')
 name_columns = ['MAC', 'NUM_MACS', 'UCAST', 'MCAST', 'BCAST','ARP','IPF','IP_ICMP','IP_UDP','IP_TCP','IP_RESTO','IP6','ETH_RESTO','ARP_noIP','SSDP','ICMPv6']
 
 # Type the columns you want to delete in the training phase
-delete_columns = ['MAC']
+delete_columns = ['MAC']c
 
 
 """ To train the Isolation Forest algorithm manually """
@@ -44,6 +44,7 @@ def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
             df_aux = df.drop(delete_columns, axis=1)
 
             if c == 'auto':
+                # In this section, we consider an anomaly if a row has the ARP_noIP value greater than 40
                 c = df_aux[df_aux > 40 ].count()['ARP_noIP'] / len(df_aux.axes[0])
                 print("Calculation of the contamination parameter = num ARP_noIP columns largest than 40 / total rows in the dataset")
                 print(f"Contamination: {df_aux[df_aux > 40 ].count()['ARP_noIP']} / {len(df_aux.axes[0])} = {float(c)}")
@@ -51,7 +52,7 @@ def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
             else:
                 classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
 
-            print(f"Training taking into accout these columns: {(df_aux.columns.tolist())}")
+            print(f"Training bear in mind these columns: {(df_aux.columns.tolist())}")
 
             # Trainning and prediction of the results
             pred = classifier.fit_predict(df_aux)
@@ -78,7 +79,7 @@ def train_dataset(dataset, c='auto', filename='model_iso_forest.bin'):
         print(e)
 
 
-""" To train the Isolation Forest algorithm from the main program automatically. Return if the training was succesful or not and the value of contamination """
+""" In order to train Isolation Forest algorithm from the main program automatically. Return an string if the training was succesful or not and the value of contamination """
 def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest.bin'):
     global name_columns
     train_successful = True
@@ -95,6 +96,7 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
             df = df.fillna(0)
             to_model_columns=df.columns[1:19]
             df[to_model_columns] = df[to_model_columns].astype(int)
+            df_aux = df.drop(delete_columns, axis=1)
 
             # In order to generate outliers automatically:
             if generate_outliers:
@@ -118,11 +120,11 @@ def train_capture(dataset, c, generate_outliers=True, filename='model_iso_forest
             # Generate the outliers manually:
             else:
                 if c == 'auto':
-                    # We obtain the contamination parameter if ARP_noIP is biggest than 20
-                    # c = num of ARP_noIP columns largest than 20 (its value is large in network scanning tools) / total rows in the dataset
-                    if df[df > 40 ].count()['ARP_noIP'] > 0:
-                        c = df[df_noMAC > 40 ].count()['ARP_noIP'] / len(df.axes[0])
-                        classifier = IsolationForest(bootstrap=False, contamination=float(c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
+                    # In this section, we consider an anomaly if a row has the ARP_noIP value greater than 40
+                    num_anomalies_in_dataset = df_aux[df_aux > 40 ].count()['ARP_noIP']
+                    if num_anomalies_in_dataset > 0:
+                        new_c = num_anomalies_in_dataset / len(df.axes[0])
+                        classifier = IsolationForest(bootstrap=False, contamination=float(new_c), max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
                     else:
                         classifier = IsolationForest(bootstrap=False, contamination='auto', max_features=1.0, max_samples='auto', n_estimators=100, n_jobs=None, random_state=42, warm_start=False)
                 else:
@@ -179,11 +181,11 @@ if __name__ == '__main__':
                 if float(contamination) > float(0.5) or float(contamination) < 0:
                     print("\t\nERROR! The CONTAMINATION parameter must be in the range [0, 0.5]\n")
                 else:
-                    print(f'\nTrainning the model with contamination {contamination} \n')
+                    print(f'\nTraining the model with contamination {contamination} \n')
                     train_dataset(file, float(contamination))
             except:
                 print("ERROR! Please enter a valid contamination number. Remember that it has to be in the range [0, 0.5] or 'auto'")
         else:
             contamination = 'auto'
-            print(f'\nTrainning the model with contamination {contamination}. \n')
+            print(f'\nTraining the model with contamination {contamination}. \n')
             train_dataset(file, contamination)
